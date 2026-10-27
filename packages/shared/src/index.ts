@@ -4,7 +4,14 @@ export const AVATARS = [
   { id: "muse", name: "Muse", image: "/avatars/identity-lineup.png", position: "100% 50%", color: "#d3c2ff", accent: "#49396a" }
 ] as const;
 
+export const ACTIONS = [
+  { id: "wave", name: "Wave", symbol: "👋" },
+  { id: "cheer", name: "Cheer", symbol: "✨" },
+  { id: "dance", name: "Dance", symbol: "♫" }
+] as const;
+
 export type AvatarId = (typeof AVATARS)[number]["id"];
+export type ActionId = (typeof ACTIONS)[number]["id"];
 
 export type Participant = {
   id: string;
@@ -12,6 +19,8 @@ export type Participant = {
   avatarId: AvatarId;
   x: number;
   y: number;
+  action: ActionId | null;
+  actionNonce: number;
 };
 
 export type JoinPayload = {
@@ -31,5 +40,6 @@ export type ServerToClientEvents = {
 export type ClientToServerEvents = {
   joinRoom: (payload: JoinPayload) => void;
   move: (payload: MovePayload) => void;
+  performAction: (actionId: ActionId) => void;
 };
 

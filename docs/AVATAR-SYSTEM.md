@@ -53,3 +53,7 @@ VELNEST combines those lessons at a much smaller 2D hackathon scope: one shared 
 
 The Blender production handoff is specified in `docs/BLENDER-ASSET-BRIEF.md`.
 
+## Motion language
+
+The shared rig supports idle, locomotion, wave, cheer, dance, celebrate, and sit. The Day 1 web prototype broadcasts wave, cheer, and dance over the same realtime room channel as movement, so controller actions appear immediately in the OBS overlay. Reference turnarounds and shared action poses live under `art/reference/`.
+

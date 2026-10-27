@@ -3,6 +3,8 @@ import Fastify from "fastify";
 import { Server } from "socket.io";
 import {
   AVATARS,
+  ACTIONS,
+  type ActionId,
   type AvatarId,
   type ClientToServerEvents,
   type Participant,
@@ -24,6 +26,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(app.server, {
 
 const participants = new Map<string, Participant>();
 const allowedAvatarIds = new Set<string>(AVATARS.map((avatar) => avatar.id));
+const allowedActionIds = new Set<string>(ACTIONS.map((action) => action.id));
 
 function emitRoomState() {
   io.emit("roomState", [...participants.values()]);
@@ -47,7 +50,9 @@ io.on("connection", (socket) => {
       displayName: cleanDisplayName(displayName),
       avatarId: avatarId as AvatarId,
       x: 20 + Math.round(Math.random() * 60),
-      y: 24 + Math.round(Math.random() * 52)
+      y: 24 + Math.round(Math.random() * 52),
+      action: null,
+      actionNonce: 0
     });
     emitRoomState();
   });
@@ -61,6 +66,23 @@ io.on("connection", (socket) => {
     participant.x = Math.max(5, Math.min(95, participant.x + safeDx * 2.25));
     participant.y = Math.max(12, Math.min(88, participant.y + safeDy * 2.25));
     emitRoomState();
+  });
+
+  socket.on("performAction", (actionId) => {
+    const participant = participants.get(socket.id);
+    if (!participant || !allowedActionIds.has(actionId)) return;
+
+    const actionNonce = Date.now();
+    participant.action = actionId as ActionId;
+    participant.actionNonce = actionNonce;
+    emitRoomState();
+
+    setTimeout(() => {
+      const current = participants.get(socket.id);
+      if (!current || current.actionNonce !== actionNonce) return;
+      current.action = null;
+      emitRoomState();
+    }, 1600);
   });
 
   socket.on("disconnect", () => {

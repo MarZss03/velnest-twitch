@@ -48,7 +48,7 @@ Cosmetics should be separate objects, origin-aligned to their socket, and tested
 
 - `velnest_base_rig.blend`
 - `riff.glb`, `arc.glb`, `muse.glb`
-- shared idle, walk, wave, celebrate, and sit animation clips
+- shared idle, walk, wave, cheer, dance, celebrate, and sit animation clips
 - GLB with embedded textures, meters, +Y up after engine import normalization
 - one neutral lighting turntable render per character for approval
 
@@ -56,5 +56,6 @@ Cosmetics should be separate objects, origin-aligned to their socket, and tested
 
 - readable at 96 px tall
 - no clipping in idle, walk, wave, and one handheld prop pose
+- wave reads through one raised forearm and body lean; cheer through a two-beat jump; dance through a four-beat side-to-side groove
 - every shared cosmetic attaches without per-character position edits
 - draw-call and triangle targets hold in a 50-avatar stress scene

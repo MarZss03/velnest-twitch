@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import {
   AVATARS,
+  ACTIONS,
+  type ActionId,
   type AvatarId,
   type ClientToServerEvents,
   type Participant,
@@ -33,6 +35,7 @@ function World({ participants, connected }: { participants: Participant[]; conne
           return (
             <div
               className="participant"
+              data-action={participant.action ?? "idle"}
               key={participant.id}
               style={{ left: `${participant.x}%`, top: `${participant.y}%` }}
             >
@@ -80,6 +83,19 @@ function Dpad({ onMove }: { onMove: (direction: Direction) => void }) {
       <span className="dpad-center" />
       {button("→", { dx: 1, dy: 0 }, "right")}
       {button("↓", { dx: 0, dy: 1 }, "down")}
+    </div>
+  );
+}
+
+function ActionBar({ onAction }: { onAction: (actionId: ActionId) => void }) {
+  return (
+    <div className="action-bar" aria-label="Character actions">
+      {ACTIONS.map((action) => (
+        <button key={action.id} onClick={() => onAction(action.id)} type="button">
+          <span aria-hidden="true">{action.symbol}</span>
+          {action.name}
+        </button>
+      ))}
     </div>
   );
 }
@@ -194,6 +210,7 @@ export function App() {
             <h2>Move your character</h2>
             <p>Use WASD, arrow keys, or the controls below. Open another tab to add a second character.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
+            <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />
             <div className="obs-note">
               <span>OBS BROWSER SOURCE</span>
               <code>http://localhost:5173/?view=overlay</code>

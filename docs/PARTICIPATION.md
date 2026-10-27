@@ -30,7 +30,8 @@ Official resources: https://twitchcon-codex.devpost.com/resources
 - GitHub Codex connection: authenticated as `MarZss03`
 - Twitch browser session: authenticated as `meemokiller`
 - Devpost: GitHub sign-in complete; profile fields are prepared for final submission
-- Twitch Developer Console: access authorized; application creation is blocked until Twitch two-factor authentication is enabled
+- Twitch two-factor authentication: enabled
+- Twitch Developer Console: requires a fresh login after 2FA logged out the previous developer session; application form can then be recreated
 
 ## Local tools
 
@@ -49,7 +50,7 @@ The local repository is initialized in `D:\Velnest - Twitch`. A public GitHub re
 ## Browser actions waiting for owner confirmation
 
 1. Submit the completed Devpost profile, then finish the hackathon join flow.
-2. Enable two-factor authentication on Twitch account `meemokiller`.
+2. Log back in to Twitch Developer after the 2FA security logout.
 3. Retry creation of the prepared `VELNEST TwitchCon 2026` confidential website application.
 4. Create the prepared public GitHub repository and push the local `main` branch.
 

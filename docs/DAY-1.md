@@ -15,6 +15,7 @@ Prove the product's core feeling before integrating Twitch credentials: multiple
 - [x] Define three modular, non-furry identity bases and shared cosmetic slots
 - [x] Add realtime join/move/leave protocol
 - [x] Add keyboard and touch controller UI
+- [x] Add realtime wave, cheer, and dance actions
 - [x] Add OBS overlay mode
 - [x] Run the app and verify two controllers plus one overlay
 - [ ] Submit the completed Devpost profile and join the hackathon (form prepared; final submission pending confirmation)
