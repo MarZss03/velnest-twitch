@@ -2,7 +2,7 @@
 
 ## Product decision
 
-VELNEST does not ship three fixed characters or furry mascots. It ships three **humanoid identity bases** that share one skeleton and one prop system while accepting streamer-specific themes.
+VELNEST ships three simple **chibi humanoid identity bases** that share one skeleton and one prop system while accepting streamer-specific themes. Their visual language is smooth, rounded, low-poly 3D: readable like a collectible game figure, but restrained enough to avoid a preschool look.
 
 ## The three bases
 
@@ -18,7 +18,7 @@ A balanced, athletic humanoid with a cropped performance-jacket silhouette. Best
 
 A slightly taller, relaxed humanoid with a lightweight long-overshirt silhouette. Best for music, art, Just Chatting, and narrative streams.
 
-All three use the same headwear scale, simplified hand shape, shoe footprint, animation skeleton, and attachment coordinates. A prop is authored once and can be reused across all three.
+All three use one large rounded head, dot eyes, mitten hands, short limbs, the same headwear scale, shoe footprint, animation skeleton, and attachment coordinates. Personality comes from a single hairstyle, one outerwear silhouette, pose, and color blocking—not surface clutter. A prop is authored once and can be reused across all three.
 
 ## Shared customization contract
 
@@ -44,9 +44,12 @@ VELNEST combines those lessons at a much smaller 2D hackathon scope: one shared 
 ## Art constraints
 
 - non-furry and non-animal
-- all-ages safe without reading as preschool or toy-like
+- all-ages safe, cute without reading as preschool
 - strong silhouette at 64–128 px on a livestream
-- mostly neutral/recolorable surfaces
+- matte vinyl and soft-fabric materials with large neutral/recolorable regions
+- no armor, masks, tiny accessories, dangling pieces, intricate patterns, or cyberpunk clutter
 - no user-uploaded art in the MVP
 - original assets only; no third-party game characters or logos
+
+The Blender production handoff is specified in `docs/BLENDER-ASSET-BRIEF.md`.
 

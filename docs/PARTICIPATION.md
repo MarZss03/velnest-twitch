@@ -29,8 +29,8 @@ Official resources: https://twitchcon-codex.devpost.com/resources
 
 - GitHub Codex connection: authenticated as `MarZss03`
 - Twitch browser session: authenticated as `meemokiller`
-- Devpost: GitHub sign-in complete; required profile setup is open and waiting for owner choices
-- Twitch Developer Console: waiting for authorization to view the account email before opening the console
+- Devpost: GitHub sign-in complete; profile fields are prepared for final submission
+- Twitch Developer Console: access authorized; application creation is blocked until Twitch two-factor authentication is enabled
 
 ## Local tools
 
@@ -44,17 +44,14 @@ Official resources: https://twitchcon-codex.devpost.com/resources
 
 ## Repository plan
 
-The local repository is initialized in `D:\Velnest - Twitch`. Creating the remote repository is intentionally deferred until visibility is chosen:
-
-- **public:** easiest for judging and testing;
-- **private:** allowed, but `testing@devpost.com` must be granted access.
+The local repository is initialized in `D:\Velnest - Twitch`. A public GitHub repository named `velnest-twitch` is prepared for creation; public visibility is chosen for easier judging and testing.
 
 ## Browser actions waiting for owner confirmation
 
-1. Finish the Devpost profile with the owner's occupation and tech-employment answers, then join the hackathon.
-2. Authorize Twitch Developer to view the email address of Twitch account `meemokiller`.
-3. Create the Twitch Developer application and its persistent client credentials.
-4. Create the GitHub remote after the owner chooses public or private visibility.
+1. Submit the completed Devpost profile, then finish the hackathon join flow.
+2. Enable two-factor authentication on Twitch account `meemokiller`.
+3. Retry creation of the prepared `VELNEST TwitchCon 2026` confidential website application.
+4. Create the prepared public GitHub repository and push the local `main` branch.
 
 ## Submission strategy
 

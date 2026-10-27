@@ -17,8 +17,8 @@ Prove the product's core feeling before integrating Twitch credentials: multiple
 - [x] Add keyboard and touch controller UI
 - [x] Add OBS overlay mode
 - [x] Run the app and verify two controllers plus one overlay
-- [ ] Complete Devpost profile and registration (GitHub sign-in complete; waiting for owner profile choices)
-- [ ] Register a Twitch developer application (waiting for owner confirmation at authorization/key creation)
+- [ ] Submit the completed Devpost profile and join the hackathon (form prepared; final submission pending confirmation)
+- [ ] Register a Twitch developer application (Twitch requires account 2FA before creation)
 - [ ] Record a 15–30 second proof clip once the vertical slice is verified
 
 ## End-of-day evidence
