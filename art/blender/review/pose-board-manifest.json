@@ -1,0 +1,510 @@
+{
+  "source": "editable production .blend assets",
+  "samples": [
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "none",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 5580
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "headphones",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6668
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "backpack",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6028
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "riff",
+      "cosmetic": "lightstick",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 5864
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "none",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 5804
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "headphones",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6892
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "backpack",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6252
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "arc",
+      "cosmetic": "lightstick",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6088
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "none",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6216
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "headphones",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 7304
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "backpack",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6664
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Idle",
+      "frame": 16,
+      "trianglesIncludingProp": 6500
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Walk",
+      "frame": 8,
+      "trianglesIncludingProp": 6500
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Wave",
+      "frame": 16,
+      "trianglesIncludingProp": 6500
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Cheer",
+      "frame": 16,
+      "trianglesIncludingProp": 6500
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Dance",
+      "frame": 16,
+      "trianglesIncludingProp": 6500
+    },
+    {
+      "identity": "muse",
+      "cosmetic": "lightstick",
+      "clip": "Sit",
+      "frame": 16,
+      "trianglesIncludingProp": 6500
+    }
+  ],
+  "scope": "one static sample per combination; backpack row is viewed from behind"
+}

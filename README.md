@@ -56,11 +56,14 @@ pnpm test:motion
 pnpm test:seating
 pnpm test:capacity
 pnpm test:labels
+pnpm test:cosmetics
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.
 
 See [clean-clone verification](docs/REPRODUCIBILITY.md) for the tested public revision and the limits of that evidence.
+
+The [Blender pose boards](art/blender/review/README.md) show 72 sampled character/accessory/action combinations. `test:cosmetics` additionally checks 360 runtime samples, delayed asset loading and disposal when accessories are switched.
 
 ## Project map
 

@@ -31,7 +31,7 @@ Every base exposes the same six logical slots:
 5. hand effect or prop
 6. foot/hover/trail effect
 
-MVP uses one neutral look per base. Theme packs can later define a compatible item for any subset of those slots.
+The current MVP offers the original look, headphones, backpack and lightstick on every base. The exported attachment names are `Head`, `slot_head`, `slot_face`, `slot_chest`, `slot_back`, `slot_hand_L` and `slot_hand_R`; the runtime currently uses `Head`, `slot_back` and `slot_hand_R`. The logical foot/effect slot above is a planning target, not an exported socket in this build. Theme packs can later extend the compatible item set.
 
 ## What we learned from existing systems
 
@@ -39,7 +39,7 @@ MVP uses one neutral look per base. Theme packs can later define a compatible it
 - Fall Guys makes customization legible through a small number of slots such as color, pattern, face, upper, lower, and nameplate.
 - VRChat treats outfit switches, appearance toggles, and expressions as saved parameters rather than separate hard-coded avatars.
 
-VELNEST combines those lessons at a much smaller 2D hackathon scope: one shared slot schema, three distinct silhouettes, parameterized cosmetics, and fixed allow-listed assets.
+VELNEST applies those lessons to the current Blender/Three.js room: shared attachment coordinates, three distinct silhouettes, parameterized cosmetics and fixed allow-listed assets.
 
 ## Art constraints
 
@@ -55,5 +55,7 @@ The Blender production handoff is specified in `docs/BLENDER-ASSET-BRIEF.md`.
 
 ## Motion language
 
-The shared rig supports idle, locomotion, wave, cheer, dance, celebrate, and sit. The Day 1 web prototype broadcasts wave, cheer, and dance over the same realtime room channel as movement, so controller actions appear immediately in the OBS overlay. Reference turnarounds and shared action poses live under `art/reference/`.
+The current exported rig has six named clips: Idle, Walk, Wave, Cheer, Dance and Sit. The earlier handoff's separate Celebrate proposal has not been implemented as a seventh clip; current celebration uses Cheer. Wave, Cheer and Dance share the realtime room channel with movement and seating. Reference turnarounds and shared action poses live under `art/reference/`.
+
+The [production pose review](../art/blender/review/README.md) covers one static sample of each of the 72 identity/accessory/clip combinations. Runtime tests exercise five times per combination, matching authored and temporary prop envelopes, animated attachment transforms and cleanup. They do not sign off every frame/angle, facial animation or all of the original handoff's performance targets.
 

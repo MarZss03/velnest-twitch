@@ -10,6 +10,10 @@ for name in ['headphones','backpack','lightstick']:
     bpy.ops.object.delete(use_global=False)
     material=bpy.data.materials.new('Mint silicone')
     material.diffuse_color=(.35,.78,.62,1)
+    material.use_nodes=True
+    bsdf=material.node_tree.nodes.get('Principled BSDF')
+    bsdf.inputs['Base Color'].default_value=material.diffuse_color
+    bsdf.inputs['Roughness'].default_value=.72
     def sphere(label,location,scale):
         bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,location=location)
         obj=bpy.context.object

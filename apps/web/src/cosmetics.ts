@@ -10,7 +10,7 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
   oldItems.forEach(obj => {
     obj.visible=false;
     obj.removeFromParent();
-    obj.traverse(child => { if(child instanceof THREE.Mesh) { child.geometry.dispose(); (Array.isArray(child.material)?child.material:[child.material]).forEach(material=>material.dispose()); } });
+    dispose3D(obj);
   });
   const slot = id === 'headphones' ? 'Head' : id === 'backpack' ? 'slot_back' : 'slot_hand_R';
   const parent = model.getObjectByName(slot);
@@ -28,7 +28,7 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
     item.add(gltf.scene);
     item.children.filter(child=>child!==gltf.scene).forEach(child=>{child.visible=false;});
   },undefined,()=>{ /* Keep the geometric fallback if the authored asset cannot load. */ });
-  const material = new THREE.MeshStandardMaterial({color: '#a6e2c5', roughness: .55});
+  const material = new THREE.MeshStandardMaterial({color: new THREE.Color(.35,.78,.62), roughness: .72});
   const add = (geometry: THREE.BufferGeometry, x: number, y: number, z: number) => {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x,y,z);
@@ -36,16 +36,15 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
     item.add(mesh);
     return mesh;
   };
-  // Blender's authored joint-local frame is Z-up, including exported sockets.
+  // Match the authored GLBs in glTF's Y-up local frame while they load.
   if (id === 'headphones') {
-    const band=add(new THREE.TorusGeometry(.245,.018,8,24,Math.PI),0,0,.025);
-    band.rotation.x=Math.PI/2;
-    for(const x of [-.245,.245]) add(new THREE.SphereGeometry(.055,12,8),x,0,0).scale.set(.6,1,1.3);
+    add(new THREE.TorusGeometry(.245,.018,8,24,Math.PI),0,0,0);
+    for(const x of [-.245,.245]) add(new THREE.SphereGeometry(1,12,8),x,0,0).scale.set(.035,.075,.065);
   } else if (id === 'backpack') {
-    add(new THREE.BoxGeometry(.20,.10,.24),0,.04,-.03);
+    add(new THREE.SphereGeometry(1,12,8),0,-.03,-.055).scale.set(.12,.15,.075);
+    add(new THREE.SphereGeometry(1,12,8),0,-.07,-.12).scale.set(.09,.06,.025);
   } else {
-    const stick=add(new THREE.CylinderGeometry(.018,.018,.27,12),0,0,.10);
-    stick.rotation.x=Math.PI/2;
-    add(new THREE.SphereGeometry(.045,12,8),0,0,.25);
+    add(new THREE.CylinderGeometry(.022,.022,.30,12),0,.12,0);
+    add(new THREE.SphereGeometry(.04,12,8),0,.28,0);
   }
 }

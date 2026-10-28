@@ -1,0 +1,23 @@
+{
+  "identities": 3,
+  "cosmetics": 4,
+  "clips": 6,
+  "times": [
+    0,
+    0.2,
+    0.5,
+    1.2,
+    1.9
+  ],
+  "poseSamples": 360,
+  "slowLoadFallbacks": 9,
+  "discardedLoadChecks": 3,
+  "hashes": {
+    "/models/riff.glb": "e224f3e8be9224cf923c507fd580ce6f5fa86ba35f3dc23a76e2ddeee34e3ad8",
+    "/models/arc.glb": "b4145db788ee37ddd6cfc30feb08cacabaf101fa79c5ec3636a89c25dcb8038e",
+    "/models/muse.glb": "9e69034bd081ab7965bd1b70042a86f712f1613f61c4688c695d42cdcc844613",
+    "/models/props/headphones.glb": "3b795aa1ad7013bcdd3cabb60557644f7005d365d3f6733bc5bbc373f59a528c",
+    "/models/props/backpack.glb": "63f6d413b6455125ff89dcbed40b5ab16f8c21191a9506d4125e320f190c4e24",
+    "/models/props/lightstick.glb": "0fde680db4998046639376dea6036700b74eeb6487284fa438e722124b0850d4"
+  }
+}

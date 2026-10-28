@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "scripts": {
+    "test:cosmetics": "pnpm --filter @velnest/server exec tsx ../web/scripts/verify-cosmetics.mjs",
     "test:capacity": "pnpm --filter @velnest/shared build && pnpm --filter @velnest/server build && node --test apps/web/scripts/verify-capacity.mjs",
     "test:labels": "node --experimental-strip-types --test apps/web/scripts/verify-labels.mjs",
     "test:seating": "pnpm --filter @velnest/shared build && pnpm --filter @velnest/server build && node --test apps/web/scripts/verify-seating.mjs",
