@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import type { AvatarId } from '@velnest/shared';
+import type { AvatarId, CosmeticId } from '@velnest/shared';
+import { attachCosmetic } from './cosmetics';
 
-export function AvatarPreview({ avatarId }: { avatarId: AvatarId }) {
+export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: AvatarId; cosmetic?: CosmeticId }) {
   const host = useRef<HTMLDivElement>(null);
   const play = useRef<(name: string) => void>(() => {});
   const [status, setStatus] = useState('Loading character…');
@@ -34,6 +35,7 @@ export function AvatarPreview({ avatarId }: { avatarId: AvatarId }) {
     new GLTFLoader().load(`/models/${avatarId}.glb`, gltf => {
       if (disposed) return;
       scene.add(gltf.scene);
+      attachCosmetic(gltf.scene, cosmetic);
       mixer = new THREE.AnimationMixer(gltf.scene);
       play.current = name => {
         mixer?.stopAllAction();
@@ -69,7 +71,7 @@ export function AvatarPreview({ avatarId }: { avatarId: AvatarId }) {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [avatarId]);
+  }, [avatarId, cosmetic]);
   return <section className="character-preview" aria-label={`${avatarId} 3D preview`}>
     <div ref={host} className="character-canvas" />
     <p role="status">{status}</p>

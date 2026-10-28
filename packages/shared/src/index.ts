@@ -12,6 +12,13 @@ export const ACTIONS = [
 
 export type AvatarId = (typeof AVATARS)[number]["id"];
 export type ActionId = (typeof ACTIONS)[number]["id"];
+export const COSMETICS = [
+  { id: 'none', name: 'Original' },
+  { id: 'headphones', name: 'Headphones' },
+  { id: 'backpack', name: 'Backpack' },
+  { id: 'lightstick', name: 'Lightstick' }
+] as const;
+export type CosmeticId = (typeof COSMETICS)[number]['id'];
 
 export type Participant = {
   id: string;
@@ -21,11 +28,13 @@ export type Participant = {
   y: number;
   action: ActionId | null;
   actionNonce: number;
+  cosmetic: CosmeticId;
 };
 
 export type JoinPayload = {
   displayName: string;
   avatarId: AvatarId;
+  cosmetic?: CosmeticId;
 };
 
 export type MovePayload = {

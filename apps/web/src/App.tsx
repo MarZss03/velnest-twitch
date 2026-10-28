@@ -5,6 +5,8 @@ import { Room3D } from './Room3D';
 import {
   AVATARS,
   ACTIONS,
+  COSMETICS,
+  type CosmeticId,
   type ActionId,
   type AvatarId,
   type ClientToServerEvents,
@@ -125,7 +127,8 @@ export function App() {
   const [joined, setJoined] = useState(isOverlay);
   const [displayName, setDisplayName] = useState(() => `Nestling${Math.floor(10 + Math.random() * 90)}`);
   const [avatarId, setAvatarId] = useState<AvatarId>("riff");
-  const joinedProfile = useRef<{ displayName: string; avatarId: AvatarId } | null>(null);
+  const [cosmetic, setCosmetic] = useState<CosmeticId>('none');
+  const joinedProfile = useRef<{ displayName: string; avatarId: AvatarId; cosmetic: CosmeticId } | null>(null);
 
   useEffect(() => {
     const onConnect = () => {
@@ -182,7 +185,7 @@ export function App() {
   }, [joined, socket]);
 
   const join = () => {
-    joinedProfile.current = { displayName, avatarId };
+    joinedProfile.current = { displayName, avatarId, cosmetic };
     socket.emit("joinRoom", joinedProfile.current);
     setJoined(true);
   };
@@ -208,7 +211,7 @@ export function App() {
 
           <div className="join-card">
             <h2>Make an entrance.</h2>
-            <AvatarPreview avatarId={avatarId} />
+            <AvatarPreview avatarId={avatarId} cosmetic={cosmetic} />
             <label>
               <span>Your name</span>
               <input value={displayName} maxLength={20} onChange={(event) => setDisplayName(event.target.value)} />
@@ -230,6 +233,12 @@ export function App() {
                 </button>
               ))}
             </div>
+            <label className="cosmetic-picker">
+              <span>Bring something along</span>
+              <select value={cosmetic} onChange={event => setCosmetic(event.target.value as CosmeticId)}>
+                {COSMETICS.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
             <button className="enter-button" onClick={join} disabled={!displayName.trim()} type="button">
               Enter the room
             </button>

@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import {
   AVATARS,
   ACTIONS,
+  COSMETICS,
   type ActionId,
   type AvatarId,
   type ClientToServerEvents,
@@ -42,7 +43,7 @@ io.on("connection", (socket) => {
   // snapshot immediately instead of waiting for the next player event.
   socket.emit("roomState", [...participants.values()]);
 
-  socket.on("joinRoom", ({ displayName, avatarId }) => {
+  socket.on("joinRoom", ({ displayName, avatarId, cosmetic }) => {
     if (!allowedAvatarIds.has(avatarId)) return;
 
     participants.set(socket.id, {
@@ -52,7 +53,8 @@ io.on("connection", (socket) => {
       x: 20 + Math.round(Math.random() * 60),
       y: 24 + Math.round(Math.random() * 52),
       action: null,
-      actionNonce: 0
+      actionNonce: 0,
+      cosmetic: COSMETICS.some(item => item.id === cosmetic) ? cosmetic! : 'none'
     });
     emitRoomState();
   });
