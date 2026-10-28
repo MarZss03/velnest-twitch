@@ -2,7 +2,7 @@
 
 The Blender generator at `art/blender/build_avatars.py` creates three editable modular humanoids, their named attachment points, and five transform animation clips: Idle, Walk, Wave, Cheer, Dance. Run it using the installed Blender executable on D:.
 
-Outputs are `art/blender/{riff,arc,muse}.blend` and `apps/web/public/models/{riff,arc,muse}.glb`. Each GLB has five verified animation clips. These are geometric prototypes with joint hierarchies, not yet skinned production character rigs.
+Outputs are `art/blender/{riff,arc,muse}.blend` and `apps/web/public/models/{riff,arc,muse}.glb`. Each GLB has five verified animation clips and a standard humanoid skin. Current weights bind each rounded toy component rigidly to one deform bone; flexible elbow/knee deformation is not yet authored.
 
 `AvatarPreview.tsx` loads the selected GLB with Three.js, supports pointer rotation and animation selection, and disposes GPU resources on character changes. Reduced-motion preferences disable clip playback.
 
@@ -11,6 +11,9 @@ Outputs are `art/blender/{riff,arc,muse}.blend` and `apps/web/public/models/{rif
 Browser review confirmed the room and character render successfully. Remaining: refine silhouettes against the generated art references, add skinned rigs and walking, improve the authored environment, and verify multiple clients plus OBS with the new renderer.
 
 ## Latest verification
+
+- Added `VELNEST_Rig` with seven deform bones, armature modifiers, full vertex weights, and baked pose clips. Retained named control sockets so cosmetics stay compatible.
+- The animation verifier now requires SkinnedMesh instances, evaluates actual skinned vertex positions, checks finite deformation, and compares the left-arm skin deformation matrix to the authored control rotation during Cheer. All three characters passed, along with the existing five-clip behavior checks.
 
 - Export inspection found Cheer omitted constant raised-arm channels. Disabled animation-size pruning and enabled full transform baking in Blender. Every clip now includes the six animated joints' translation, rotation, and scale channels, preserving held poses and reset values.
 - `pnpm test:animations` loads all three GLBs through the actual Three.js GLTFLoader and AnimationMixer. It samples five clips and verifies raised arms, jump height, wave motion, opposing walk samples, dance motion, and restoration of idle arm/root transforms. All three identities passed.

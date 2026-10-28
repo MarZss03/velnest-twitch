@@ -1,6 +1,7 @@
 """Rebuild VELNEST's editable, modular 3D avatar library with Blender."""
 import bpy
 import math
+from mathutils import Vector
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -105,6 +106,64 @@ for identity in ['riff','arc','muse']:
             track.name=clip
             track.strips.new(clip,1,action)
             obj.animation_data.action=None
+    # Convert modular rigid pieces to an actual skinned mesh rig. Each piece has
+    # one joint weight, keeping the toy silhouette while exporting standard skins.
+    controls=[root,body,head,*arms,*legs]
+    bpy.context.scene.frame_set(1)
+    for control in animated:
+        for track in control.animation_data.nla_tracks: track.mute=True
+        control.rotation_euler=(0,0,0)
+    root.location.z=0
+    bpy.context.view_layer.update()
+    armature_data=bpy.data.armatures.new('VELNEST shared humanoid skeleton')
+    rig=bpy.data.objects.new('VELNEST_Rig',armature_data)
+    bpy.context.collection.objects.link(rig)
+    bpy.ops.object.select_all(action='DESELECT')
+    rig.select_set(True)
+    bpy.context.view_layer.objects.active=rig
+    bpy.ops.object.mode_set(mode='EDIT')
+    for control in controls:
+        bone=armature_data.edit_bones.new('bone_'+control.name)
+        bone.head=control.matrix_world.translation
+        bone.tail=bone.head+Vector((0,.08,0))
+        if control.parent in controls: bone.parent=armature_data.edit_bones['bone_'+control.parent.name]
+    bpy.ops.object.mode_set(mode='OBJECT')
+    meshes=[obj for obj in bpy.context.scene.objects if obj.type=='MESH']
+    for obj in meshes:
+        controller=obj.parent
+        world=obj.matrix_world.copy()
+        obj.parent=rig
+        obj.matrix_world=world
+        group=obj.vertex_groups.new(name='bone_'+controller.name)
+        group.add(list(range(len(obj.data.vertices))),1.0,'REPLACE')
+        modifier=obj.modifiers.new('Shared humanoid skin','ARMATURE')
+        modifier.object=rig
+    for clip in ['Idle','Walk','Wave','Cheer','Dance']:
+        for control in animated:
+            for track in control.animation_data.nla_tracks:track.mute=track.name!=clip
+        rig.animation_data_create()
+        rig.animation_data.action=None
+        for frame in range(1,62):
+            bpy.context.scene.frame_set(frame)
+            bpy.context.view_layer.update()
+            for control in controls:
+                pose=rig.pose.bones['bone_'+control.name]
+                pose.rotation_mode='QUATERNION'
+                pose.matrix=control.matrix_world
+                bpy.context.view_layer.update()
+                for channel in ['location','rotation_quaternion','scale']:
+                    pose.keyframe_insert(data_path=channel,frame=frame)
+        action=rig.animation_data.action
+        action.name=clip+'_Skin'
+        track=rig.animation_data.nla_tracks.new()
+        track.name=clip
+        track.strips.new(clip,1,action)
+        track.mute=True
+        rig.animation_data.action=None
+    for control in animated:
+        for track in control.animation_data.nla_tracks:track.mute=False
+    for track in rig.animation_data.nla_tracks:track.mute=False
+    bpy.context.scene.frame_set(1)
     bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender'/f'{identity}.blend'))
     bpy.ops.export_scene.gltf(
         filepath=str(OUT/f'{identity}.glb'),export_format='GLB',
