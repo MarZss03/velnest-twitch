@@ -20,7 +20,7 @@ type Direction = { dx: number; dy: number };
 const realtimeUrl = import.meta.env.VITE_REALTIME_URL ?? "http://localhost:3001";
 const isOverlay = new URLSearchParams(window.location.search).get("view") === "overlay";
 
-function World({ participants, connected }: { participants: Participant[]; connected: boolean }) {
+function World({ participants, connected, onNavigate }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void }) {
   return (
     <section className="world-shell" aria-label="VELNEST shared world">
       <div className="world-topline">
@@ -28,7 +28,7 @@ function World({ participants, connected }: { participants: Participant[]; conne
         <span>{participants.length} inside</span>
       </div>
       <div className="world">
-        <Room3D participants={participants} />
+        <Room3D participants={participants} onNavigate={onNavigate} />
         <div className="moon" />
         <div className="hill hill-one" />
         <div className="hill hill-two" />
@@ -247,10 +247,10 @@ export function App() {
         </section>
       ) : (
         <section className="play-layout">
-          <World participants={participants} connected={connected} />
+          <World participants={participants} connected={connected} onNavigate={position=>socket.emit('moveTo',position)} />
           <aside className="controller">
             <h2>Hey, {displayName}.</h2>
-            <p>Use WASD, arrow keys, or the controls below. Open another tab to add a second character.</p>
+            <p>Click the floor to walk. Use WASD, arrow keys, or hold the controls below. Furniture blocks your path.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />
             <label className="cosmetic-picker">

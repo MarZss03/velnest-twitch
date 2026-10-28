@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import type { Participant } from '@velnest/shared';
+import { floorHeight, fromWorld, type Participant } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[]; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
 
-export function Room3D({ participants }: { participants: Participant[] }) {
+export function Room3D({ participants, onNavigate }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void }) {
   const host = useRef<HTMLDivElement>(null);
   const people = useRef(participants);
   people.current = participants;
+  const navigate=useRef(onNavigate);
+  navigate.current=onNavigate;
   const [error, setError] = useState('');
   useEffect(() => {
     const el = host.current;
@@ -34,6 +36,16 @@ export function Room3D({ participants }: { participants: Participant[] }) {
     key.shadow.camera.right = key.shadow.camera.top = 7;
     key.shadow.mapSize.set(1024,1024);
     scene.add(key);
+    const raycaster=new THREE.Raycaster();
+    const ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+    const point=new THREE.Vector3();
+    const onClick=(event:MouseEvent)=>{
+      if(!navigate.current) return;
+      const rect=renderer.domElement.getBoundingClientRect();
+      raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1),camera);
+      if(raycaster.ray.intersectPlane(ground,point)) navigate.current(fromWorld(point.x,point.z));
+    };
+    renderer.domElement.addEventListener('click',onClick);
     const box = (name: string, size: number[], pos: number[], color: string) => {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size as [number,number,number]), new THREE.MeshStandardMaterial({color, roughness: .8}));
       mesh.name = name;
@@ -105,6 +117,7 @@ export function Room3D({ participants }: { participants: Participant[] }) {
         if (!actor) continue;
         if(actor.cosmetic!==p.cosmetic) { attachCosmetic(actor.model,p.cosmetic); actor.cosmetic=p.cosmetic; }
         actor.target.set((p.x-50)/12,0,(p.y-50)/16);
+        actor.target.y=floorHeight(actor.target.x,actor.target.z);
         const delta=actor.target.clone().sub(actor.model.position);
         const walking=delta.lengthSq()>.0004;
         if(walking) actor.model.rotation.y=Math.atan2(delta.x,delta.z);
@@ -124,7 +137,7 @@ export function Room3D({ participants }: { participants: Participant[] }) {
       frame=requestAnimationFrame(render);
     };
     frame=requestAnimationFrame(render);
-    return () => { disposed=true; cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { disposed=true; renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
   },[]);
   return <div className="room-3d" ref={host} aria-label={`3D community room with ${participants.length} participants`}>
     {error && <p className="room-error" role="alert">{error}</p>}

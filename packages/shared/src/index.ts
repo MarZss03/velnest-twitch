@@ -1,3 +1,5 @@
+export { toWorld, fromWorld, canOccupy, moveInRoom, floorHeight } from './room.js';
+
 export const AVATARS = [
   { id: "riff", name: "Riff", image: "/avatars/identity-lineup.png", position: "0% 50%", color: "#b59cff", accent: "#3b2a64" },
   { id: "arc", name: "Arc", image: "/avatars/identity-lineup.png", position: "50% 50%", color: "#a5f3dc", accent: "#24483f" },
@@ -51,5 +53,6 @@ export type ClientToServerEvents = {
   move: (payload: MovePayload) => void;
   performAction: (actionId: ActionId) => void;
   changeCosmetic: (cosmetic: CosmeticId) => void;
+  moveTo: (position: { x: number; y: number }) => void;
 };
 
