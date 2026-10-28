@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
+import { AvatarPreview } from './AvatarPreview';
+import { Room3D } from './Room3D';
 import {
   AVATARS,
   ACTIONS,
@@ -20,16 +22,18 @@ function World({ participants, connected }: { participants: Participant[]; conne
   return (
     <section className="world-shell" aria-label="VELNEST shared world">
       <div className="world-topline">
-        <span className="live-dot" data-connected={connected} />
-        {connected ? "VELNEST LIVE" : "RECONNECTING"}
+        {connected ? "Connected to the nest" : "Reconnecting…"}
         <span>{participants.length} inside</span>
       </div>
       <div className="world">
+        <Room3D participants={participants} />
         <div className="moon" />
         <div className="hill hill-one" />
         <div className="hill hill-two" />
         <div className="pond" />
         <div className="fire"><i /><i /><i /></div>
+        <div className="room-sign" aria-hidden="true">The afterparty<br /><small>Stay for one more game.</small></div>
+        <div className="stage-platform" aria-hidden="true" />
         {participants.map((participant) => {
           const avatar = AVATARS.find((item) => item.id === participant.avatarId) ?? AVATARS[0];
           return (
@@ -55,8 +59,8 @@ function World({ participants, connected }: { participants: Participant[]; conne
         })}
         {participants.length === 0 && (
           <div className="empty-world">
-            <span>THE NEST IS QUIET</span>
-            Waiting for the first subscriber
+            <span>Your community goes here.</span>
+            Choose your character and make yourself at home.
           </div>
         )}
       </div>
@@ -92,7 +96,6 @@ function ActionBar({ onAction }: { onAction: (actionId: ActionId) => void }) {
     <div className="action-bar" aria-label="Character actions">
       {ACTIONS.map((action) => (
         <button key={action.id} onClick={() => onAction(action.id)} type="button">
-          <span aria-hidden="true">{action.symbol}</span>
           {action.name}
         </button>
       ))}
@@ -162,31 +165,32 @@ export function App() {
   return (
     <main className="app-shell">
       <header>
-        <a className="brand" href="/">VELNEST<span>✦</span></a>
-        <div className="mock-pill">DAY 1 · MOCK TWITCH ID</div>
+        <a className="brand" href="/">velnest<span> / </span>the community room</a>
+        <div className="mock-pill">Local demo</div>
       </header>
 
       {!joined ? (
         <section className="join-layout">
           <div className="intro">
-            <p className="eyebrow">YOUR PLACE IN THE STREAM</p>
-            <h1>Don’t just watch.<br /><em>Be there.</em></h1>
-            <p className="lede">A tiny shared world for the people who make a Twitch community feel like home.</p>
-            <div className="proof"><span>LIVE PROTOTYPE</span> Real Twitch entitlement arrives Day 2.</div>
+            <h1>Meet you in the nest.</h1>
+            <p className="lede">Your Twitch community, hanging out between the good moments.</p>
+            <World participants={participants} connected={connected} />
           </div>
 
           <div className="join-card">
-            <div className="step"><span>01</span> Choose your name</div>
+            <h2>Make an entrance.</h2>
+            <AvatarPreview avatarId={avatarId} />
             <label>
-              <span>DISPLAY NAME</span>
+              <span>Your name</span>
               <input value={displayName} maxLength={20} onChange={(event) => setDisplayName(event.target.value)} />
             </label>
-            <div className="step"><span>02</span> Choose your form</div>
+            <div className="step">Pick your character</div>
             <div className="avatar-grid">
               {AVATARS.map((avatar) => (
                 <button
                   className="avatar-card"
                   data-selected={avatar.id === avatarId}
+                  aria-pressed={avatar.id === avatarId}
                   key={avatar.id}
                   onClick={() => setAvatarId(avatar.id)}
                   type="button"
@@ -198,16 +202,16 @@ export function App() {
               ))}
             </div>
             <button className="enter-button" onClick={join} disabled={!displayName.trim()} type="button">
-              Enter the nest <span>→</span>
+              Enter the room
             </button>
+            <p className="demo-note">Try the room with a demo name. Twitch sign-in is coming next.</p>
           </div>
         </section>
       ) : (
         <section className="play-layout">
           <World participants={participants} connected={connected} />
           <aside className="controller">
-            <p className="eyebrow">YOU’RE INSIDE</p>
-            <h2>Move your character</h2>
+            <h2>Hey, {displayName}.</h2>
             <p>Use WASD, arrow keys, or the controls below. Open another tab to add a second character.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />
