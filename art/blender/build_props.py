@@ -18,8 +18,21 @@ for name in ['headphones','backpack','lightstick']:
         obj.data.materials.append(material)
         for p in obj.data.polygons:p.use_smooth=True
     if name=='headphones':
-        bpy.ops.mesh.primitive_torus_add(major_radius=.245,minor_radius=.018,major_segments=32,minor_segments=8,rotation=(math.pi/2,0,0))
-        bpy.context.object.data.materials.append(material)
+        curve=bpy.data.curves.new('Upper headband arc','CURVE')
+        curve.dimensions='3D'
+        curve.bevel_depth=.018
+        curve.bevel_resolution=3
+        spline=curve.splines.new('POLY')
+        spline.points.add(32)
+        for i,point in enumerate(spline.points):
+            angle=i/32*math.pi
+            point.co=(math.cos(angle)*.245,0,math.sin(angle)*.245,1)
+        band=bpy.data.objects.new('Headband',curve)
+        bpy.context.collection.objects.link(band)
+        band.data.materials.append(material)
+        bpy.context.view_layer.objects.active=band
+        band.select_set(True)
+        bpy.ops.object.convert(target='MESH')
         for x in [-.245,.245]:sphere('Ear shell',(x,0,0),(.035,.065,.075))
     elif name=='backpack':
         sphere('Soft pack',(0,.055,-.03),(.12,.075,.15))

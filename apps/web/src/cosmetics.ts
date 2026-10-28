@@ -22,7 +22,8 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
       gltf.scene.traverse(child=>{if(child instanceof THREE.Mesh){child.geometry.dispose();(Array.isArray(child.material)?child.material:[child.material]).forEach(material=>material.dispose());}});
       return;
     }
-    gltf.scene.rotation.x=Math.PI/2;
+    // Both avatar joints and exported props already use glTF's Y-up frame.
+    gltf.scene.rotation.x=0;
     item.add(gltf.scene);
     item.children.filter(child=>child!==gltf.scene).forEach(child=>{child.visible=false;});
   },undefined,()=>{ /* Keep the geometric fallback if the authored asset cannot load. */ });

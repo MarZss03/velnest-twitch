@@ -12,6 +12,10 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Browser control recovered after resetting its session. The live join screen was inspected with the authored room and headphones. This exposed a full-ring headset crossing the face, a duplicated coordinate rotation, and shadow acne across the floor.
+- Rebuilt headphones with an upper arc, removed the redundant Y-up conversion, and adjusted shadow bias. Follow-up live screenshots confirmed the face is clear and floor stripe artifacts are removed. Reduced preview height and removed the join panel's empty top offset.
+- This is a targeted desktop review, not an all-character, all-prop, mobile, or animation visual approval.
+
 - Furniture collision is authoritative in `packages/shared/src/room.ts`, matching the Afterparty sofa and table footprints with avatar clearance. Spawn points are checked and diagonal movement is normalized.
 - Click-to-walk raycasts the room floor, sends a bounded destination to the server, and moves at the same cadence as keyboard input. Manual input cancels the destination. A visibility graph now plans the shortest valid route around expanded furniture corners; segment sweeps reject paths through obstacles.
 - `pnpm test:room` checks coffee-table detours, collision-free paths across the room's reachable grid, and rejection of invalid targets. All three tests passed. A live socket check also verified traversal from one side of the coffee table to the other.

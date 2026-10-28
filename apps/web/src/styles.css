@@ -132,7 +132,7 @@ input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px #a5f3c615; }
 .room-error { position: absolute; z-index: 12; padding: 12px; background: var(--room-ground); color: var(--room-ink); }
 .world > .participant { display: none; }
 .world > .empty-world { z-index: 11; pointer-events: none; }
-.character-canvas { height: 220px; touch-action: none; cursor: grab; }
+.character-canvas { height: 170px; touch-action: none; cursor: grab; }
 .character-canvas:active { cursor: grabbing; }
 .character-canvas canvas { display: block; }
 .character-preview p { font-size: 12px; color: var(--room-muted); text-align: center; }
@@ -152,7 +152,7 @@ header { height: 76px; border-color: var(--room-line); }
 .intro h1 { font-size: clamp(30px,3.4vw,52px); letter-spacing: -.04em; line-height: 1.1; margin: 0 0 12px; }
 .lede { font-size: 15px; color: var(--room-muted); margin: 0 0 20px; line-height: 1.5; }
 .intro .world { min-height: 480px; }
-.join-card { margin-top: 99px; padding: 24px 0 0 24px; border: 0; border-left: 1px solid var(--room-line); border-radius: 0; background: none; box-shadow: none; }
+.join-card { margin-top: 0; padding: 0 0 0 24px; border: 0; border-left: 1px solid var(--room-line); border-radius: 0; background: none; box-shadow: none; }
 .join-card h2, .controller h2 { margin: 0 0 24px; font-size: 24px; letter-spacing: -.025em; }
 label > span, .step { font: inherit; font-size: 14px; letter-spacing: 0; color: var(--room-muted); }
 input { border-color: var(--room-line); border-radius: 8px; background: var(--room-panel); }

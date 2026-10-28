@@ -35,6 +35,8 @@ export function Room3D({ participants, onNavigate }: { participants: Participant
     key.shadow.camera.left = key.shadow.camera.bottom = -7;
     key.shadow.camera.right = key.shadow.camera.top = 7;
     key.shadow.mapSize.set(1024,1024);
+    key.shadow.normalBias=.035;
+    key.shadow.bias=-.00015;
     scene.add(key);
     const raycaster=new THREE.Raycaster();
     const ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
