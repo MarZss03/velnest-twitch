@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { floorHeight, fromWorld, type Participant } from '@velnest/shared';
+import { AVATARS, canOccupy, floorHeight, fromWorld, type Participant } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
 import { createAnimator } from './animation';
 import { dispose3D } from './dispose3D';
+import { createRoomMotion } from './roomMotion';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
 
@@ -25,9 +26,11 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
     catch { setError('3D is unavailable in this browser. Enable hardware acceleration and reload.'); return; }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
+    const motion = createRoomMotion(scene);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     scene.background = new THREE.Color('#252127');
     const camera = new THREE.PerspectiveCamera(38, 1, .1, 60);
     camera.position.set(0, 7, 10);
@@ -49,7 +52,13 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
       if(!navigate.current) return;
       const rect=renderer.domElement.getBoundingClientRect();
       raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1),camera);
-      if(raycaster.ray.intersectPlane(ground,point)) navigate.current(fromWorld(point.x,point.z));
+      if(raycaster.ray.intersectPlane(ground,point)) {
+        const destination=fromWorld(point.x,point.z);
+        if(!canOccupy(destination.x,destination.y)) return;
+        point.y=floorHeight(point.x,point.z);
+        motion.emit('target',point,'#c7efdf',reduced.matches);
+        navigate.current(destination);
+      }
     };
     renderer.domElement.addEventListener('click',onClick);
     const box = (name: string, size: number[], pos: number[], color: string) => {
@@ -69,12 +78,13 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
     box('Table',[1.2,.12,.7],[-1.5,.5,.1],'#d7b68d');
     box('Table leg',[.15,.5,.15],[-1.5,.2,.1],'#d7b68d');
     const actors = new Map<string,Actor>();
+    const onMotionPreference=()=>actors.forEach(actor=>{ actor.action=''; });
+    reduced.addEventListener('change',onMotionPreference);
     const pending = new Set<string>();
     const failed = new Set<string>();
     const loader = new GLTFLoader();
     let disposed = false;
     let frame = 0;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const disposeModel = dispose3D;
     loader.load('/models/afterparty.glb', gltf => {
       if(disposed) { disposeModel(gltf.scene); return; }
@@ -96,6 +106,7 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
     const render = (now: number) => {
       const dt = Math.min((now-last)/1000,.05);
       last = now;
+      if(document.hidden) { frame=requestAnimationFrame(render); return; }
       const ids = new Set(people.current.map(p=>p.id));
       const player=people.current.find(person=>person.id===self.current);
       if(camera.aspect<.85 && player) {
@@ -121,7 +132,9 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
             gltf.scene.traverse(obj=>{ if(obj instanceof THREE.Mesh) obj.castShadow=true; });
             gltf.scene.rotation.y=0;
             gltf.scene.position.set((p.x-50)/12,0,(p.y-50)/16);
+            gltf.scene.position.y=floorHeight(gltf.scene.position.x,gltf.scene.position.z);
             scene.add(gltf.scene);
+            motion.emit('arrival',gltf.scene.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
             attachCosmetic(gltf.scene,p.cosmetic);
             const mixer=new THREE.AnimationMixer(gltf.scene);
             actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,cosmetic:p.cosmetic});
@@ -138,18 +151,22 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
         actor.model.position.lerp(actor.target,reduced.matches?1:1-Math.exp(-dt*14));
         const action=p.action??(walking?'walk':'idle');
         if(actor.action!==action || actor.nonce!==p.actionNonce) {
+          if(p.action && actor.nonce!==p.actionNonce) motion.emit(p.action,actor.model.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
           actor.action=action; actor.nonce=p.actionNonce;
+          actor.label.dataset.action=p.action??'';
+          actor.label.textContent=p.action ? `${p.displayName} · ${p.action}` : p.displayName;
           actor.animate(action,reduced.matches);
         }
         if(!reduced.matches) actor.mixer.update(dt);
         const screen=actor.model.position.clone().add(new THREE.Vector3(0,1.2,0)).project(camera);
         actor.label.style.transform=`translate(-50%,-100%) translate(${(screen.x*.5+.5)*el.clientWidth}px,${(-screen.y*.5+.5)*el.clientHeight}px)`;
       }
+      motion.update(dt,reduced.matches);
       renderer.render(scene,camera);
       frame=requestAnimationFrame(render);
     };
     frame=requestAnimationFrame(render);
-    return () => { disposed=true; renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
   },[]);
   return <div className="room-3d" ref={host} aria-label={`3D community room with ${participants.length} participants`}>
     {error && <p className="room-error" role="alert">{error}</p>}

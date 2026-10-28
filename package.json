@@ -4,9 +4,11 @@
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "scripts": {
+    "test:auth": "pnpm --filter @velnest/shared build && pnpm --filter @velnest/server build && node --test apps/web/scripts/verify-auth.mjs",
+    "test:motion": "node apps/web/scripts/verify-motion.mjs",
     "test:animations": "node apps/web/scripts/verify-animations.mjs",
     "test:room": "pnpm --filter @velnest/shared build && node --test packages/shared/tests/room.test.mjs",
-    "dev": "concurrently -n server,web -c magenta,cyan \"pnpm --filter @velnest/server dev\" \"pnpm --filter @velnest/web dev\"",
+    "dev": "pnpm --filter @velnest/shared build && concurrently -n server,web -c magenta,cyan \"pnpm --filter @velnest/server dev\" \"pnpm --filter @velnest/web dev\"",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck"
   },

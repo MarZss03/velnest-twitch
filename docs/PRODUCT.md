@@ -14,17 +14,17 @@ During a live stream, a verified subscriber can open a link on desktop or phone,
 
 - Twitch sign-in
 - verification that the signed-in viewer subscribes to one configured broadcaster
-- one room and one world scene
+- one Blender-built 3D lounge and one shared room
 - three safe, modular humanoid identity bases: Riff, Arc, and Muse
 - keyboard and touch movement
-- presence, name label, movement, and one emote/reaction
+- presence, name label, movement, Wave/Cheer/Dance animations and event-driven 3D effects
 - OBS-specific display mode
 - reconnect and basic rate limiting
 - mock mode for judging without live Twitch credentials
 
 ### Out
 
-- 3D world, voice chat, physics, combat, trading, or persistent economy
+- voice chat, physics, combat, trading, or persistent economy
 - user-uploaded models or textures
 - general-purpose world editor
 - arbitrary public rooms
@@ -33,6 +33,8 @@ During a live stream, a verified subscriber can open a link on desktop or phone,
 - milestone-driven slot administration
 
 Those are roadmap items, not Day 1 dependencies.
+
+The original Day 1 2D-only constraint was superseded by the owner's request for Blender 3D characters, animation and a 3D room. The current implementation and DESIGN.md reflect that direction. Twitch OAuth is implemented and tested against a simulated provider; live Twitch account verification and streamer moderation still need completion.
 
 ## Roles
 

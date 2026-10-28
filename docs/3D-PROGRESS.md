@@ -61,3 +61,12 @@ Browser review has confirmed the room and character rendering, mobile entry, and
 - Room actors face their travel direction and select Walk while interpolating toward the authoritative position.
 - Three Socket.IO clients verified two identities, movement received by an OBS observer, dance propagation, action expiry back to idle, and disconnect removal.
 - Type check and production build passed. Browser control reconnection failed during this round, so visual verification of the new walking behavior is still pending.
+# Motion pass — October 28
+
+Added shared, event-driven Three.js effects for arrival, valid floor destinations, Wave, Cheer and Dance. Effects follow the authoritative participant location, expire within 1.6 seconds and cap at 16 simultaneous cues. The UI shows the server-confirmed active reaction. Reduced motion keeps stationary destination feedback and textual action feedback; hidden tabs skip rendering. Motion-preference changes also reset character animation state.
+
+Verified: typecheck, production build, existing three-character animation checks, and `pnpm test:motion` (finite transforms, expiry, burst cap, preference changes and cleanup). Browser walkthrough covered enter/leave/re-enter, reaction controls, the visible reaction/nameplate and floor ring, and a 390px mobile layout with no horizontal overflow. Build retains the existing large JavaScript chunk warning.
+
+## Twitch identity boundary — October 28
+
+Implemented OAuth, cookie sessions, subscriber/broadcaster authorization and session revocation checks, with explicit demo mode retained. Ten automated route/realtime tests pass against a simulated Twitch provider. Browser checks confirm demo entry, cancelled-login messaging and disabled entry when real-mode credentials are missing. Compiled-server startup is also verified; shared-package exports now resolve compiled JavaScript. Live Twitch authorization and contest submission remain unverified. See TWITCH-SETUP.md.

@@ -10,6 +10,7 @@
   --room-line: #3c3842;
   --room-accent: #b99af5;
   --room-floor: #39323f;
+  --motion-arrive: cubic-bezier(.16,1,.3,1);
   --font-body: Manrope, system-ui, sans-serif;
   font-family: var(--font-body);
   color: var(--room-ink);
@@ -48,6 +49,12 @@ input,select { width: 100%; border: 1px solid var(--room-line); border-radius: 8
 .enter-button { width: 100%; margin-top: 24px; min-height: 48px; padding: 14px; border: 0; border-radius: 8px; background: var(--room-accent); color: var(--room-ground); font-weight: 800; transition: transform 180ms ease; }
 .enter-button:hover { transform: translateY(-2px); }
 .enter-button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.twitch-signin { display: block; text-align: center; text-decoration: none; }
+.account-note { color: var(--room-muted); font-size: 14px; line-height: 1.5; }
+.account-identity { display: grid; gap: 4px; font-size: 14px; }
+.account-identity button,.connection-message button { width: fit-content; min-height: 44px; border: 0; padding: 8px 0; background: none; color: var(--room-accent); text-decoration: underline; text-underline-offset: 4px; }
+.connection-message { padding: 16px 0; border-bottom: 1px solid var(--room-line); font-size: 14px; line-height: 1.6; }
+.connection-message button { display: block; }
 .demo-note { color: var(--room-muted); font-size: 12px; line-height: 1.6; }
 .cosmetic-picker { margin-top: 20px; }
 .character-canvas { height: 170px; touch-action: none; cursor: grab; }
@@ -60,6 +67,9 @@ canvas { display: block; }
 .preview-actions,.action-bar { display: flex; gap: 6px; margin-bottom: 20px; }
 .preview-actions button,.action-bar button { flex: 1; min-height: 44px; padding: 6px; border: 1px solid var(--room-line); border-radius: 6px; background: var(--room-panel); font-size: 12px; }
 .preview-actions button:hover,.action-bar button:hover { border-color: var(--room-accent); }
+.action-bar button { position: relative; overflow: hidden; transition: background-color 140ms, border-color 140ms, color 140ms; }
+.action-bar button[aria-pressed="true"] { background: var(--room-accent); color: var(--room-ground); border-color: var(--room-accent); }
+.action-bar button:active,.enter-button:active { transform: scale(.97); }
 .world-shell { min-width: 0; display: flex; flex-direction: column; }
 .world-topline { display: flex; align-items: center; justify-content: space-between; height: 40px; color: var(--room-muted); font-size: 12px; }
 .world { position: relative; flex: 1; min-height: 520px; border-radius: 12px; overflow: clip; background: var(--room-floor); isolation: isolate; }
@@ -67,11 +77,14 @@ canvas { display: block; }
 .room-3d { position: absolute; inset: 0; }
 .room-3d canvas { width: 100%; height: 100%; }
 .room-nameplate { position: absolute; left: 0; top: 0; padding: 4px 8px; border-radius: 6px; background: var(--room-ground); color: var(--room-ink); font-size: 11px; pointer-events: none; white-space: nowrap; }
+.room-nameplate[data-action]:not([data-action=""]) { color: var(--room-accent); }
 .room-error { position: absolute; z-index: 2; padding: 12px; background: var(--room-ground); color: var(--room-ink); }
 .empty-world { position: absolute; left: 5%; bottom: 24px; width: 90%; text-align: center; pointer-events: none; color: var(--room-muted); font-size: 13px; }
 .empty-world span { display: block; margin-bottom: 8px; color: var(--room-ink); font-weight: 700; }
 .play-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; align-items: stretch; gap: 20px; padding-top: 20px; min-height: calc(100vh - 108px); }
 .controller { border: 1px solid var(--room-line); border-radius: 12px; padding: 24px; }
+.play-layout .controller { animation: controller-open 420ms var(--motion-arrive); }
+@keyframes controller-open { from { clip-path: inset(0 0 100% 0 round 12px); } to { clip-path: inset(0 0 0 0 round 12px); } }
 .controller p { color: var(--room-muted); font-size: 14px; line-height: 1.6; }
 .leave-room { padding: 8px 0; min-height: 44px; border: 0; background: none; color: var(--room-muted); text-decoration: underline; text-underline-offset: 4px; font-size: 13px; }
 .leave-room:hover { color: var(--room-ink); }

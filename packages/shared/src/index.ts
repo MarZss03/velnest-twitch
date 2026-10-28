@@ -45,8 +45,15 @@ export type MovePayload = {
 };
 
 export type ServerToClientEvents = {
+  roomError: (error: { code: 'sign_in_required' | 'subscription_required'; message: string }) => void;
   roomState: (participants: Participant[]) => void;
 };
+
+export type SessionInfo = {
+  mockMode: boolean;
+  user: { id: string; displayName: string; role: 'subscriber' | 'broadcaster' | 'viewer' } | null;
+};
+export type RoomConfig = { mockMode: boolean; oauthConfigured: boolean; room: string };
 
 export type ClientToServerEvents = {
   joinRoom: (payload: JoinPayload) => void;

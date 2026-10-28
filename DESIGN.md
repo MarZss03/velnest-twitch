@@ -17,6 +17,8 @@ The source of truth is `apps/web/src/styles.css` at `:root`: ground `#151416`, p
 
 Character clips are authored in Blender and verified through Three.js. Use 160 ms crossfades, authoritative movement and pathfinding, pointer rotation in the selector, and real-time cosmetic swaps. Honor reduced-motion preferences. Names and online counts always come from actual room state.
 
+Event-driven 3D motion: an expanding floor ring marks arrivals; valid floor clicks show a destination ring; Wave lifts a ring, Cheer throws 18 violet/sage confetti pieces, and Dance sends three floor pulses. All effects expire within 1.6 seconds, share geometry, and cap at 16 concurrent cues. Hidden tabs pause rendering. Reduced motion preserves a stationary destination confirmation and textual action/nameplate feedback while suppressing celebration movement. Controls confirm the server's active action; joining reveals the control rail once over 420 ms.
+
 ## Skill application and limits
 
 Impeccable informed artifact-led hierarchy, browser inspection and corrective passes. Hallmark informed explicit tokens, visible focus, restrained copy and reduced-motion fallbacks. Taste informed replacing the generic marketing splash with the product in use. UI UX Pro Max supplied gaming/3D direction and accessible control guidance. HyperFrames is installed and its 3D guidance was consulted; no HyperFrames video has been produced yet. These are working methods and local instructions, not model training.
