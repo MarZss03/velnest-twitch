@@ -16,7 +16,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - broadcaster-only removal with a five-minute identity timeout.
 - a 24-character admission limit, with full-room spectating and automatic entry availability when a place opens.
 
-Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). Until credentials are configured and a live account walkthrough succeeds, the Twitch integration is not considered verified against Twitch itself.
+Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). On October 28 the owner authorized the live application, entered as the verified broadcaster and exercised reactions, accessories and sofa seating synchronized to OBS. A second real viewer account, public hosting and the actual Twitch broadcast demonstration remain to be verified.
 
 ## Run locally
 

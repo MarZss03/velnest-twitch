@@ -1,6 +1,6 @@
 # VELNEST submission copy
 
-Draft prepared October 28, 2026. Live Twitch authorization and the required YouTube demonstration are not yet complete. Do not treat this document as a submitted entry.
+Draft prepared October 28, 2026. Live Twitch broadcaster authorization and OBS synchronization are verified; the required Twitch broadcast and YouTube demonstration are not yet complete. Do not treat this document as a submitted entry.
 
 ## Project name
 
@@ -38,7 +38,7 @@ Separating the initial interface from the 3D renderer, self-hosting fonts and ma
 
 ### Current status and next steps
 
-The public repository runs locally in an explicitly labeled demo mode. OAuth and moderation have been exercised against a simulated Twitch provider; real user authorization and a live broadcast walkthrough remain to be completed. The developer application is registered and its credentials have been verified through Twitch's official API. The final demonstration will show the room working on Twitch and how Codex was used. There is no claim that simulated tests establish live user authorization.
+The public repository offers an explicitly labeled demo mode. The real Twitch authorization-code flow has also completed for the broadcaster account, and entry, reactions, accessory changes and sofa seating synchronized into the actual OBS Browser Source. A local rehearsal was recorded. Automated tests additionally exercise viewer admission and moderation against a simulated provider. A second real viewer account and the actual Twitch broadcast walkthrough remain to be verified; local OBS footage is not claimed as a Twitch broadcast.
 
 ## Built with
 
@@ -54,7 +54,7 @@ https://github.com/MarZss03/velnest-twitch
 
 ## Technology requirement
 
-OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and Get Users, with no additional scopes required for open viewer admission; an OBS Browser Source displays the shared room during a stream. The developer application and credentials are configured. Live user authorization and the required broadcast demonstration are still pending; current authentication and moderation evidence uses a simulated Twitch provider.
+OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and Get Users, with no additional scopes required for open viewer admission. Live broadcaster authorization and room interaction synchronized to the actual OBS Browser Source have been verified and locally recorded. The required Twitch broadcast demonstration remains pending; viewer admission and moderation also have simulated-provider test coverage.
 
 ## Streamer and community use
 
@@ -62,4 +62,4 @@ The streamer opens the room's OBS Browser Source and shares the controller link.
 
 ## Still needed from the owner
 
-Personal answers and eligibility declarations are saved, the developer application is registered and local real-mode credentials are verified. Live user authorization is awaiting action-time approval. Still needed: genuine Twitch demonstration footage, a real YouTube URL and final review of the completed entry. No placeholder video URL should be entered.
+Personal answers and eligibility declarations are saved, and live broadcaster authorization and OBS synchronization are verified. Still needed: OBS account connection, genuine Twitch broadcast footage, a real YouTube URL and final review of the completed entry. No placeholder video URL should be entered.
