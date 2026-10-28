@@ -61,7 +61,7 @@ export type SessionInfo = {
   mockMode: boolean;
   user: { id: string; displayName: string; role: 'subscriber' | 'broadcaster' | 'viewer' } | null;
 };
-export type RoomConfig = { mockMode: boolean; oauthConfigured: boolean; room: string };
+export type RoomConfig = { mockMode: boolean; oauthConfigured: boolean; room: string; admission?: 'signed-in' | 'subscribers' };
 
 export type ClientToServerEvents = {
   removeParticipant: (participantId: string, reply: (result: { ok: boolean; message: string }) => void) => void;

@@ -1,6 +1,6 @@
 # VELNEST
 
-VELNEST is a subscriber-only interactive world for Twitch communities. Viewers sign in with Twitch, choose an avatar, and control it from desktop or mobile while the shared world appears in OBS.
+VELNEST is an interactive world for Twitch communities. All signed-in Twitch viewers can choose an avatar and control it from desktop or mobile while the shared world appears in OBS.
 
 ## Current build
 
@@ -12,7 +12,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - a clean OBS overlay view;
 - event-driven 3D arrival, destination and reaction effects;
 - three reservable sofa seats with walk-to-seat, Blender-authored sitting and standing transitions;
-- server-side Twitch OAuth, subscriber verification and expiring sessions.
+- server-side Twitch OAuth, verified viewer identities and expiring sessions; optional subscriber-only admission for affiliate/partner channels.
 - broadcaster-only removal with a five-minute identity timeout.
 - a 24-character admission limit, with full-room spectating and automatic entry availability when a place opens.
 

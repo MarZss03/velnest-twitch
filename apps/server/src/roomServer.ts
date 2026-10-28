@@ -50,7 +50,7 @@ function emitRoomState() {
 
 function cleanDisplayName(value: string) {
   const normalized = value.replace(/[^\p{L}\p{N}_ -]/gu, "").trim().slice(0, 20);
-  return normalized || "Subscriber";
+  return normalized || "Viewer";
 }
 
 io.on("connection", (socket) => {
@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
     const timeout=user ? roomTimeouts.get(user.id) : undefined;
     const removed=Boolean(timeout && timeout>now());
     if(user && timeout && !removed) roomTimeouts.delete(user.id);
-    if(config.mockMode || (user && user.role !== 'viewer' && !removed)) return false;
+    if(config.mockMode || (user && (config.admission !== 'subscribers' || user.role !== 'viewer') && !removed)) return false;
     const existed=participants.delete(socket.id);
     route=[];
     if(existed) emitRoomState();

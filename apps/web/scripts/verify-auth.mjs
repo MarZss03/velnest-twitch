@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { io } from 'socket.io-client';
 import { createRoomServer } from '../../server/dist/roomServer.js';
 
-const config = { mockMode: false, webOrigin: 'http://localhost:5173', clientId: 'test-client', clientSecret: 'test-secret', redirectUri: 'http://localhost:3001/auth/twitch/callback', broadcasterId: '900', secureCookies: false };
+const config = { mockMode: false, webOrigin: 'http://localhost:5173', clientId: 'test-client', clientSecret: 'test-secret', redirectUri: 'http://localhost:3001/auth/twitch/callback', broadcasterId: '900', secureCookies: false, admission:'subscribers' };
 const json = (data, status=200) => new Response(JSON.stringify(data), {status,headers:{'Content-Type':'application/json'}});
 const pair = value => value.split(';')[0];
 function event(socket, name, predicate=()=>true) {
@@ -41,7 +41,7 @@ async function fixture(t, overrides={}) {
     assert.equal(res.statusCode,302);
     const url=new URL(res.headers.location);
     assert.equal(url.origin,'https://id.twitch.tv');
-    assert.equal(url.searchParams.get('scope'),'user:read:subscriptions');
+    assert.equal(url.searchParams.get('scope'),overrides.config?.admission==='signed-in' ? null : 'user:read:subscriptions');
     return {state:url.searchParams.get('state'),cookie:pair(res.headers['set-cookie'])};
   }
   async function login() {
@@ -121,6 +121,38 @@ test('non-subscribers may sign in but cannot control an avatar',async t=>{
   socket.emit('joinRoom',{displayName:'Spoof',avatarId:'riff'});
   assert.equal((await denied).code,'subscription_required');
 });
+
+test('open Twitch admission accepts scope-free viewers, preserves moderation and rejects revoked sessions',async t=>{
+  const f=await fixture(t,{subscribed:false,scopes:[],config:{admission:'signed-in'}});
+  const guest=await f.login(); assert.ok(guest.cookie);
+  assert.equal((await f.app.inject('/api/config')).json().admission,'signed-in');
+  assert.equal((await f.app.inject({url:'/api/session',headers:{cookie:guest.cookie}})).json().user.role,'viewer');
+  const socket=await f.connect(guest.cookie);
+  let changed=event(socket,'roomState',people=>people.length===1);
+  socket.emit('joinRoom',{displayName:'SpoofedOwner',avatarId:'riff'});
+  assert.equal((await changed)[0].displayName,'VerifiedViewer');
+  assert.equal((await socket.timeout(1000).emitWithAck('removeParticipant',socket.id)).ok,false);
+  const anonymous=await f.connect(); const denied=event(anonymous,'roomError');
+  anonymous.emit('joinRoom',{displayName:'Anonymous',avatarId:'arc'});
+  assert.equal((await denied).code,'sign_in_required');
+  f.state.userId='900'; const owner=await f.login(); const moderator=await f.connect(owner.cookie);
+  const removed=event(socket,'roomError');
+  assert.equal((await moderator.timeout(1000).emitWithAck('removeParticipant',socket.id)).ok,true);
+  assert.equal((await removed).code,'room_removed');
+  const retry=event(socket,'roomError'); socket.emit('joinRoom',{displayName:'Retry',avatarId:'riff'});
+  assert.equal((await retry).code,'room_removed');
+  f.advance(5*60_000+1);
+  const reconnected=await f.connect(guest.cookie);
+  changed=event(reconnected,'roomState',people=>people.length===1);
+  reconnected.emit('joinRoom',{displayName:'Retry',avatarId:'riff'}); await changed;
+  f.state.userId='100'; f.advance(15*60_000); await f.auth.sweep();
+  assert.ok((await f.app.inject({url:'/api/session',headers:{cookie:guest.cookie}})).json().user);
+  const revoked=event(reconnected,'roomError');
+  f.state.invalid=true; f.advance(15*60_000); await f.auth.sweep();
+  reconnected.emit('performAction','wave');
+  assert.equal((await revoked).code,'sign_in_required');
+  assert.ok(!f.calls.includes('/helix/subscriptions/user'),'open admission must never query subscription status');
+});
 test('subscriber room uses verified identity and removes access after revocation',async t=>{
   const f=await fixture(t); const {cookie}=await f.login(); const socket=await f.connect(cookie);
   const joined=event(socket,'roomState',people=>people.length===1);
@@ -146,7 +178,7 @@ test('explicit mock mode still admits demo identities',async t=>{
 });
 test('unconfigured real mode exposes no sign-in redirect or accidental mock access',async t=>{
   const f=await fixture(t,{config:{clientId:'',clientSecret:'',broadcasterId:''}});
-  assert.deepEqual((await f.app.inject('/api/config')).json(),{mockMode:false,oauthConfigured:false,room:'twitch'});
+  assert.deepEqual((await f.app.inject('/api/config')).json(),{mockMode:false,oauthConfigured:false,room:'twitch',admission:'subscribers'});
   assert.equal((await f.app.inject('/auth/twitch')).statusCode,503);
 });
 

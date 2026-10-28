@@ -1,6 +1,9 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+rem Desktop shortcuts may not inherit the Codex terminal's runtime PATH.
+if exist "%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd" set "PATH=%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback;%PATH%"
+if exist "%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" set "PATH=%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;%PATH%"
 where node >nul 2>nul
 if errorlevel 1 (
   echo Node.js is not available in this terminal. See README.md for the verified runtime.

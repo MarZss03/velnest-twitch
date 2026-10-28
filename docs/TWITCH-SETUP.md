@@ -1,22 +1,22 @@
 # Twitch connection
 
-The local room runs in demo mode by default. Real mode uses server-side authorization-code OAuth, requests only `user:read:subscriptions`, validates the token and profile, then checks the viewer's subscription to the configured broadcaster. The broadcaster may enter their own room without a self-subscription.
+The local room runs in demo mode by default. Real mode uses server-side authorization-code OAuth and validates the token and profile. The default `TWITCH_ADMISSION=signed-in` admits all signed-in Twitch viewers and requests no additional scopes or subscription data. Only the configured broadcaster can manage participants.
 
 ## Configure
 
 1. Create a confidential website application in the Twitch Developer Console. Register the exact callback `http://localhost:3001/auth/twitch/callback` for local use.
 2. Copy `.env.example` to `.env` in the repository root. Fill in the application client ID, secret, and numeric broadcaster ID. Never commit `.env` or put the secret in a `VITE_` variable.
 3. Set `MOCK_MODE=false`, leaving `WEB_ORIGIN=http://localhost:5173` for the standard local ports. A blank `VITE_REALTIME_URL` uses localhost:3001 in development and the current site origin in the compiled single-host app.
-4. Restart `pnpm dev`. The entry screen changes from Local demo to Twitch community. Connect with Twitch, approve the subscription-read permission, and return to choose a character.
+4. Restart `pnpm dev`. The entry screen changes from Local demo to Twitch community. Connect with Twitch and return to choose a character.
 
-The configured broadcaster must be an affiliate or partner for Twitch's subscriber-check endpoint. A signed-in non-subscriber can watch but cannot control an avatar. If no credentials are present in real mode, entry stays disabled and the page says the Twitch connection is pending.
+Optional `TWITCH_ADMISSION=subscribers` requests `user:read:subscriptions` and restricts avatar control to subscribers and the broadcaster. That mode requires an affiliate/partner channel; other signed-in viewers may only watch. The owner selected open admission for the current standard channel. If no credentials are present in real mode, entry stays disabled and the page says the Twitch connection is pending.
 
 ## Session behavior
 
 - Tokens and client secrets stay on the server. Browser cookies contain random session IDs, are HttpOnly and SameSite=Lax, and become Secure under `NODE_ENV=production`.
 - Login state is random, cookie-bound, single-use and expires after ten minutes.
 - Sessions expire within one hour or at token expiry, whichever comes first. Sign in again when the session expires; refresh tokens are not stored.
-- Active sessions revalidate both token and subscription every fifteen minutes. Revoked or expired sessions lose control of their avatar. Log out invalidates the server session immediately.
+- Active sessions revalidate the token every fifteen minutes, and subscription status only in subscriber mode. Revoked or expired sessions lose control of their avatar. Log out invalidates the server session immediately.
 - Session data is in memory. Restarting the server signs everyone out. This MVP supports one server process; multiple instances require a shared session/room store.
 - OAuth callback query strings and provider error bodies are excluded from application logs. Identity responses are not cached.
 
@@ -30,10 +30,10 @@ The server checks the broadcaster session for every removal. Subscribers, anonym
 
 ## Evidence and remaining verification
 
-`pnpm test:auth` runs twelve tests covering callback binding/replay/expiry, token scope and revocation, cookie/session expiry, logout origin checks, anonymous and non-subscriber rejection, verified display-name enforcement, subscriber reaction propagation, entitlement loss, broadcaster access, explicit mock mode and unconfigured real mode. Moderation coverage includes subscriber/demo rejection, removing every connection for an identity, seat release, reconnect and fresh-login denial, expiry, stale targets, self-removal rejection and revoked broadcaster access. HTTP routes and actual Socket.IO connections are exercised against a simulated provider.
+`pnpm test:auth` runs thirteen tests covering callback binding/replay/expiry, scope-free open admission, optional subscriber admission, token scope and revocation, cookie/session expiry, logout origin checks, anonymous rejection, verified display names, reactions, broadcaster access, explicit mock mode and unconfigured real mode. Open-admission coverage checks that no subscription endpoint is called, viewers cannot moderate, broadcaster removal still blocks reentry, timeouts expire and revoked sessions lose access. Other moderation coverage includes multi-connection removal, seat release, fresh-login denial, stale targets and self-removal rejection. HTTP routes and actual Socket.IO connections use a simulated provider.
 
 An isolated local browser fixture verified the broadcaster controls before/after joining, cancellation, confirmed removal, count/list updates, empty state, focus returning to the management heading and responsive layout. The fixture was separate from the application and used simulated accounts; it does not establish real Twitch authorization.
 
-Still required: configure the real developer application, complete live account authorization, verify subscriber/broadcaster behavior against Twitch, and record the product working on Twitch for the contest. Automated provider simulation does not prove those steps.
+The real application credentials have been verified and configured privately. Still required: complete live user authorization, verify viewer/broadcaster behavior against Twitch and record the product working on Twitch for the contest. Automated provider simulation does not prove those steps. Optional subscriber mode remains unverified against a real affiliate/partner channel.
 
 Official references: [Authorization code flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow), [Check User Subscription](https://dev.twitch.tv/docs/api/reference/#check-user-subscription), [Token validation](https://dev.twitch.tv/docs/authentication/validate-tokens/).

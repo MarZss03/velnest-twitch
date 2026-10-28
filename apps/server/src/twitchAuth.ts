@@ -1,7 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 
-const SCOPE = 'user:read:subscriptions';
 const SESSION_COOKIE = 'velnest_session';
 const STATE_COOKIE = 'velnest_oauth';
 const MINUTE = 60_000;
@@ -14,6 +13,7 @@ export type AuthConfig = {
   redirectUri: string;
   broadcasterId: string;
   secureCookies: boolean;
+  admission?: 'signed-in' | 'subscribers';
 };
 export type TwitchIdentity = { id: string; displayName: string; role: 'subscriber' | 'broadcaster' | 'viewer' };
 type Session = { user: TwitchIdentity; token: string; expiresAt: number; validatedAt: number };
@@ -28,6 +28,7 @@ export function authConfigFromEnv(): AuthConfig {
     redirectUri: process.env.TWITCH_REDIRECT_URI ?? 'http://localhost:3001/auth/twitch/callback',
     broadcasterId: process.env.TWITCH_BROADCASTER_ID ?? '',
     secureCookies: process.env.NODE_ENV === 'production',
+    admission: process.env.TWITCH_ADMISSION === 'subscribers' ? 'subscribers' : 'signed-in',
   };
 }
 
@@ -41,6 +42,7 @@ export function registerTwitchAuth(app: FastifyInstance, config: AuthConfig, dep
   const states = new Map<string, number>();
   const sessions = new Map<string, Session>();
   const configured = Boolean(config.clientId && config.clientSecret && config.broadcasterId);
+  const requiredScope = config.admission === 'subscribers' ? 'user:read:subscriptions' : undefined;
   const cookie = (name: string, value: string, seconds: number) => `${name}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${seconds}${config.secureCookies ? '; Secure' : ''}`;
   const returnToRoom = (result: string) => `${config.webOrigin}/?auth=${result}`;
   const helixHeaders = (token: string) => ({ Authorization: `Bearer ${token}`, 'Client-Id': config.clientId });
@@ -50,12 +52,13 @@ export function registerTwitchAuth(app: FastifyInstance, config: AuthConfig, dep
     const response = await twitch('https://id.twitch.tv/oauth2/validate', { headers: { Authorization: `OAuth ${token}` } });
     if (!response.ok) throw new Error('Token validation failed');
     const data = await response.json() as Validation;
-    if (data.client_id !== config.clientId || !data.user_id || !data.scopes?.includes(SCOPE) || !(data.expires_in > 0)) throw new Error('Invalid token identity or scope');
+    if (data.client_id !== config.clientId || !data.user_id || (requiredScope && !data.scopes?.includes(requiredScope)) || !(data.expires_in > 0)) throw new Error('Invalid token identity or scope');
     return data;
   }
 
   async function entitlement(token: string, userId: string): Promise<TwitchIdentity['role']> {
     if (userId === config.broadcasterId) return 'broadcaster';
+    if (config.admission !== 'subscribers') return 'viewer';
     const query = new URLSearchParams({ broadcaster_id: config.broadcasterId, user_id: userId });
     const response = await twitch(`https://api.twitch.tv/helix/subscriptions/user?${query}`, { headers: helixHeaders(token) });
     if (response.status === 404) return 'viewer';
@@ -73,7 +76,7 @@ export function registerTwitchAuth(app: FastifyInstance, config: AuthConfig, dep
   }
 
   // Sessions never persist across restarts. Revalidate active sessions every 15 minutes,
-  // including subscriber eligibility; Twitch requires token validation at least hourly.
+  // including subscriber eligibility when enabled; revoked tokens always lose access.
   async function sweep() {
     for (const [state, expiry] of states) if (expiry <= now()) states.delete(state);
     await Promise.allSettled([...sessions].map(async ([id, session]) => {
@@ -101,14 +104,15 @@ export function registerTwitchAuth(app: FastifyInstance, config: AuthConfig, dep
     return payload;
   });
 
-  app.get('/api/config', async () => ({ mockMode: config.mockMode, oauthConfigured: configured, room: config.mockMode ? 'demo' : 'twitch' }));
+  app.get('/api/config', async () => ({ mockMode: config.mockMode, oauthConfigured: configured, room: config.mockMode ? 'demo' : 'twitch', admission: config.admission ?? 'signed-in' }));
   app.get('/api/session', async req => ({ mockMode: config.mockMode, user: sessionForCookie(req.headers.cookie)?.user ?? null }));
   app.get('/auth/twitch', async (_req, reply) => {
     if (!configured) return reply.code(503).send({ error: 'Twitch sign-in is not configured yet.' });
     if (states.size >= 1000) return reply.code(429).send({ error: 'Too many sign-in attempts. Try again shortly.' });
     const state = randomBytes(32).toString('hex');
     states.set(state, now() + 10 * MINUTE);
-    const query = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.redirectUri, response_type: 'code', scope: SCOPE, state });
+    const query = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.redirectUri, response_type: 'code', state });
+    if (requiredScope) query.set('scope', requiredScope);
     return reply.header('Set-Cookie', cookie(STATE_COOKIE, state, 600)).redirect(`https://id.twitch.tv/oauth2/authorize?${query}`);
   });
   app.get<{ Querystring: { state?: string; code?: string; error?: string } }>('/auth/twitch/callback', async (req, reply) => {

@@ -251,8 +251,9 @@ export function App() {
     return () => { clearInterval(interval); window.removeEventListener("keydown", onKeyDown); window.removeEventListener('keyup',onKeyUp); window.removeEventListener('blur',clear); };
   }, [joined, socket]);
 
+  const subscriptionRequired=roomConfig?.admission==='subscribers' && account?.role==='viewer';
   const join = () => {
-    if(accountLoading || accountError || !roomConfig || !connected || participants.length>=ROOM_CAPACITY || (!roomConfig.mockMode && (!account || account.role==='viewer'))) return;
+    if(accountLoading || accountError || !roomConfig || !connected || participants.length>=ROOM_CAPACITY || (!roomConfig.mockMode && (!account || subscriptionRequired))) return;
     setRoomFailure({message:''});
     joinedProfile.current = { displayName, avatarId, cosmetic };
     socket.emit("joinRoom", joinedProfile.current);
@@ -336,10 +337,10 @@ export function App() {
             </label>
             {roomConfig && !roomConfig.mockMode && !account && roomConfig.oauthConfigured && connected && !accountLoading && !accountError ?
               <a className="enter-button twitch-signin" href={`${realtimeUrl}/auth/twitch`}>Connect with Twitch</a> :
-              <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || roomFull || !roomConfig || (!roomConfig.mockMode && (!account || account.role==='viewer'))} type="button">
-                {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : roomFull ? 'Room full' : 'Enter the room'}
+              <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || roomFull || !roomConfig || (!roomConfig.mockMode && (!account || subscriptionRequired))} type="button">
+                {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : subscriptionRequired && !roomConfig?.mockMode ? 'Subscriber access required' : roomFull ? 'Room full' : 'Enter the room'}
               </button>}
-            <p className="demo-note" role="status">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomFull ? `All ${ROOM_CAPACITY} places are in use. You can watch here; entry reopens when someone leaves.` : roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : account?.role==='broadcaster' ? 'Your channel, your room. Join in or manage participants below.' : account ? 'Your subscription is verified. Choose a character and enter.' : 'Sign in to verify your place in the channel community.'}</p>
+            <p className="demo-note" role="status">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomFull ? `All ${ROOM_CAPACITY} places are in use. You can watch here; entry reopens when someone leaves.` : roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : subscriptionRequired ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : account?.role==='broadcaster' ? 'Your channel, your room. Join in or manage participants below.' : account ? 'You’re signed in. Choose a character and enter.' : roomConfig?.admission==='subscribers' ? 'Sign in to verify your place in the channel community.' : 'Everyone with a Twitch account is welcome. Sign in to join the room.'}</p>
             <details className="preview-details" onToggle={event=>setPreviewOpen(event.currentTarget.open)}>
               <summary>Inspect character and animations</summary>
               {previewOpen && <SceneBoundary><Suspense fallback={<div className="preview-loading" role="status">Opening character preview…</div>}><AvatarPreview avatarId={avatarId} cosmetic={cosmetic} /></Suspense></SceneBoundary>}

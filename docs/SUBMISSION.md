@@ -8,7 +8,7 @@ VELNEST
 
 ## Elevator pitch
 
-A shared 3D lounge for Twitch communities. Subscribers choose a modular character, hang out and react together, while the streamer brings their activity into OBS.
+A shared 3D lounge for Twitch communities. Viewers sign in, choose a modular character, hang out and react together, while the streamer brings their activity into OBS.
 
 ## Project story
 
@@ -18,7 +18,7 @@ A Twitch community has familiar names, recurring jokes and shared moments. VELNE
 
 ### What it does
 
-Subscribers choose one of three simple humanoid characters, Riff, Arc or Muse, and add headphones, a backpack or a lightstick. They can walk around furniture, wave, cheer, dance and reserve a sofa cushion. Reactions combine authored character animation with brief floor rings and confetti. The streamer displays the same room through an OBS Browser Source.
+Signed-in viewers choose one of three simple humanoid characters, Riff, Arc or Muse, and add headphones, a backpack or a lightstick. They can walk around furniture, wave, cheer, dance and reserve a sofa cushion. Reactions combine authored character animation with brief floor rings and confetti. The streamer displays the same room through an OBS Browser Source.
 
 The room server owns movement, reactions and seat reservations. A broadcaster can remove a participant for five minutes; the timeout follows the verified Twitch identity across tabs, reconnects and fresh logins. Other viewers can continue watching.
 
@@ -28,7 +28,7 @@ Codex helped develop the TypeScript application, React controller, Three.js room
 
 Design skills guided the visual direction, interaction details and browser review. HyperFrames was used for an editable 12-second motion study built from the actual 3D assets. That study is separate from the required live Twitch demonstration.
 
-The Twitch integration uses server-side authorization-code OAuth, token validation and the Check User Subscription API. Browser cookies contain an opaque session identifier; tokens remain on the server. The broadcaster can enter without subscribing to their own channel.
+The Twitch integration uses server-side authorization-code OAuth, token validation and the Get Users API. Open admission requests no additional scopes and lets every authenticated Twitch viewer join. Browser cookies contain an opaque session identifier; tokens remain on the server. Only the configured broadcaster can manage the room. An optional subscriber-only mode uses Check User Subscription for affiliate/partner channels.
 
 ### Challenges and lessons
 
@@ -38,7 +38,7 @@ Separating the initial interface from the 3D renderer, self-hosting fonts and ma
 
 ### Current status and next steps
 
-The public repository runs locally in an explicitly labeled demo mode. OAuth and moderation have been exercised against a simulated Twitch provider; real Twitch authorization, subscriber verification and a live broadcast walkthrough remain to be completed. The final demonstration will show the room working on Twitch and how Codex was used. There is no claim that simulated tests establish live Twitch integration.
+The public repository runs locally in an explicitly labeled demo mode. OAuth and moderation have been exercised against a simulated Twitch provider; real user authorization and a live broadcast walkthrough remain to be completed. The developer application is registered and its credentials have been verified through Twitch's official API. The final demonstration will show the room working on Twitch and how Codex was used. There is no claim that simulated tests establish live user authorization.
 
 ## Built with
 
@@ -54,12 +54,12 @@ https://github.com/MarZss03/velnest-twitch
 
 ## Technology requirement
 
-OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and the Check User Subscription API; an OBS Browser Source displays the shared room during a stream. Live Twitch authorization and the required broadcast demonstration are still pending; current authentication and moderation evidence uses a simulated Twitch provider.
+OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and Get Users, with no additional scopes required for open viewer admission; an OBS Browser Source displays the shared room during a stream. The developer application and credentials are configured. Live user authorization and the required broadcast demonstration are still pending; current authentication and moderation evidence uses a simulated Twitch provider.
 
 ## Streamer and community use
 
-The streamer opens the room's OBS Browser Source and shares the controller link. A viewer signs in with Twitch, passes the configured channel's subscription check, chooses a character and accessory, then moves, reacts or sits with the community. The shared room appears in the broadcast. The broadcaster can manage participants without entering an avatar and can impose a five-minute room timeout. Non-subscribers can watch. A separate labeled demo mode lets judges inspect the shared interactions without supplying Twitch credentials.
+The streamer opens the room's OBS Browser Source and shares the controller link. Any viewer signs in with Twitch, chooses a character and accessory, then moves, reacts or sits with the community; no channel subscription is required. The shared room appears in the broadcast. The broadcaster can manage participants without entering an avatar and can impose a five-minute room timeout. Anonymous viewers can watch. A separate labeled demo mode lets judges inspect the shared interactions without supplying Twitch credentials.
 
 ## Still needed from the owner
 
-Country of residence, personal learning/reuse survey answers, confirmation of the eligibility declarations, restored Twitch Developer login and final review of the completed entry. A genuine YouTube URL must be supplied after recording the project working on Twitch; no placeholder video URL should be entered.
+Personal answers and eligibility declarations are saved, the developer application is registered and local real-mode credentials are verified. Live user authorization is awaiting action-time approval. Still needed: genuine Twitch demonstration footage, a real YouTube URL and final review of the completed entry. No placeholder video URL should be entered.
