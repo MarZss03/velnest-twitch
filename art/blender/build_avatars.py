@@ -44,16 +44,36 @@ def shape(name, location, scale, mat, parent):
     for p in obj.data.polygons: p.use_smooth = True
     return obj
 
+def garment(name,location,size,mat,parent,radius=.025):
+    bpy.ops.mesh.primitive_cube_add(size=1)
+    obj=bpy.context.object
+    obj.name=name
+    obj.dimensions=size
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    bevel=obj.modifiers.new('Rounded garment seams','BEVEL')
+    bevel.width=radius
+    bevel.segments=3
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    obj.parent=parent
+    obj.location=location
+    obj.data.materials.append(mat)
+    return obj
+
 for identity in ['riff','arc','muse']:
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
     root = joint('Root', (0,0,0))
     body = joint('Body', (0,0,.53), root)
-    shape('Torso', (0,0,0), (.17,.115,.20), purple, body)
-    shape('Shirt', (0,-.105,.025), (.10,.025,.135), cream, body)
+    garment('Jacket', (0,0,0), (.33,.21,.32), purple, body,.045)
+    garment('Shirt panel', (0,-.112,.025), (.145,.018,.25), cream, body,.012)
+    garment('Hem', (0,-.002,-.145), (.33,.22,.035), cream, body,.012)
     head = joint('Head', (0,0,.29), body)
     shape('Face', (0,0,0), (.235,.19,.22), skin, head)
     shape('Hair', (0,.025,.10), (.24,.185,.145), hair if identity=='arc' else purple, head)
+    for x in [-.135,0,.135]:
+        fringe=shape('Fringe',(x,-.12,.105),(.085,.07,.105),hair if identity=='arc' else purple,head)
+        fringe.rotation_euler.y=x*2
+    for x in [-.23,.23]:shape('Ear',(x,0,-.01),(.035,.035,.05),skin,head)
     for x in [-.073,.073]:
         shape('Eye', (x,-.181,-.005), (.018,.014,.029), dark, head)
     arms=[]
@@ -62,12 +82,15 @@ for identity in ['riff','arc','muse']:
         arm=joint('Arm_'+side,(sign*.16,0,.09),body)
         shape('Sleeve_'+side,(sign*.045,0,-.09),(.075,.083,.13),purple,arm)
         shape('Hand_'+side,(sign*.065,-.006,-.21),(.062,.06,.067),skin,arm)
+        garment('Cuff_'+side,(sign*.06,0,-.17),(.12,.13,.045),cream,arm,.018)
         joint('slot_hand_'+side,(sign*.065,-.04,-.24),arm)
         arms.append(arm)
         leg=joint('Leg_'+side,(sign*.085,0,.34),root)
         legs.append(leg)
-        shape('Trousers_'+side,(0,0,-.085),(.071,.083,.11),cream if identity=='muse' else purple,leg)
-        shape('Shoe_'+side,(0,-.035,-.25),(.08,.115,.06),cream,leg)
+        garment('Trousers_'+side,(0,0,-.085),(.14,.16,.20),cream if identity=='muse' else purple,leg,.025)
+        garment('Shoe_'+side,(0,-.035,-.25),(.15,.21,.095),cream,leg,.03)
+        garment('Sole_'+side,(0,-.035,-.29),(.155,.215,.025),purple,leg,.009)
+        garment('Shoe strap_'+side,(0,-.065,-.20),(.15,.055,.025),mint,leg,.01)
     if identity=='riff':
         shape('Hair tuft',(.04,0,.235),(.065,.06,.10),purple,head)
     elif identity=='arc':
@@ -75,7 +98,8 @@ for identity in ['riff','arc','muse']:
         shape('Cap brim',(0,-.19,.14),(.20,.12,.025),purple,head)
     else:
         shape('Bob back',(0,.09,.01),(.25,.14,.23),purple,head)
-        shape('Long overshirt',(0,.015,-.12),(.19,.12,.14),purple,body)
+        for x in [-.20,.20]:shape('Bob side',(x,0,-.015),(.065,.16,.18),purple,head)
+        garment('Long overshirt',(0,.015,-.12),(.36,.22,.24),purple,body,.035)
     for name, pos, parent in [('slot_head',(0,0,.25),head),('slot_face',(0,-.20,0),head),('slot_back',(0,.13,.04),body),('slot_chest',(0,-.14,.05),body)]: joint(name,pos,parent)
     bpy.context.scene.render.fps=30
     animated = [root,body,*arms,*legs]

@@ -12,6 +12,9 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Refined the real meshes with beveled jacket, shirt, hem, trousers, shoe soles and straps; added cuffs, ears, fringe, and Muse's bob side panels. Skeleton dimensions and cosmetic sockets remain shared.
+- `art/blender/render_lineup.py` renders the editable assets as `characters-preview.png`; this still was inspected and shows the actual mesh lineup. Five-clip skin sampling passed for all three revised avatars.
+
 - Added Leave and change character: clears authoritative presence and navigation, returns to the selector, and retains appearance choices. A live socket check passed leave, presence removal, and rejoin as another identity on the same connection.
 - Selector and room share a 160 ms animation crossfade helper. GPU disposal now deduplicates geometries/materials and frees skeleton textures; late avatar/prop responses are discarded after disposal.
 
