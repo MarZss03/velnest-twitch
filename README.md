@@ -40,6 +40,10 @@ http://localhost:5173/?view=overlay
 
 The realtime server runs at `http://localhost:3001`.
 
+For Windows development, [START-VELNEST.cmd](START-VELNEST.cmd) starts the existing two-port workflow once Node.js, pnpm and dependencies are installed. Keep its console open while using the app.
+
+The compiled site can also run together with the API through `pnpm start` after `pnpm build`. See [single-host setup and verification limits](docs/DEPLOYMENT.md).
+
 If port 5173 is occupied, Vite may select another port. Set `WEB_ORIGIN` in `.env` to the exact frontend origin printed by Vite, then restart the app. For a phone on the same trusted network, both `WEB_ORIGIN` and `VITE_REALTIME_URL` need the development computer's reachable network address instead of `localhost`; a responsive browser preview does not establish physical-phone connectivity.
 
 An editable 12-second Blender/HyperFrames motion study and its verified 1080p MP4 are in [art/motion/velnest-room](art/motion/velnest-room/README.md). This staged character sequence is separate from the required live Twitch contest demonstration.
@@ -57,6 +61,7 @@ pnpm test:seating
 pnpm test:capacity
 pnpm test:labels
 pnpm test:cosmetics
+pnpm test:hosting
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.

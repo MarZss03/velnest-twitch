@@ -24,7 +24,7 @@ const Room3D=lazy(()=>import('./Room3D').then(module=>({default:module.Room3D}))
 type VelnestSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 type Direction = { dx: number; dy: number };
 
-const realtimeUrl = import.meta.env.VITE_REALTIME_URL ?? "http://localhost:3001";
+const realtimeUrl = import.meta.env.VITE_REALTIME_URL?.trim() || (import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin);
 const isOverlay = new URLSearchParams(window.location.search).get("view") === "overlay";
 const overlayUrl = new URL('/?view=overlay',window.location.origin).href;
 const authMessages: Record<string,string> = {

@@ -18,8 +18,8 @@ Prove the product's core feeling before integrating Twitch credentials: multiple
 - [x] Add realtime wave, cheer, and dance actions
 - [x] Add OBS overlay mode
 - [x] Run the app and verify two controllers plus one overlay
-- [ ] Submit the completed Devpost profile and join the hackathon (form prepared; final submission pending confirmation)
-- [ ] Register a Twitch developer application (Twitch requires account 2FA before creation)
+- [x] Sign in to Devpost and create the hackathon project draft (the final entry is not submitted)
+- [ ] Register a Twitch developer application (2FA and developer login are complete; the prepared application awaits confirmation)
 - [ ] Record a 15–30 second proof clip once the vertical slice is verified
 
 ## End-of-day evidence

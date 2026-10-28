@@ -28,10 +28,10 @@ Official resources: https://twitchcon-codex.devpost.com/resources
 ## Account status
 
 - GitHub Codex connection: authenticated as `MarZss03`
-- Twitch Developer login currently displays the username/password screen. The owner must restore the session and complete 2FA; do not assume the prior `meemokiller` session remains active.
+- Twitch Developer login was restored by the owner and verified in the live console as `meemokiller` on October 28. The console showed zero applications. The VELNEST registration form is now prepared for review, but Create has not been clicked pending action-time confirmation.
 - Devpost: authenticated as `MarZss03`; an existing project draft is now named **VELNEST** with its elevator pitch saved. A fresh overview load confirms **DRAFT, 2/5 steps done**. Submission ID `1268408`, project preview slug `velnest`.
 - Twitch two-factor authentication: enabled
-- Twitch Developer Console: requires a fresh login after 2FA logged out the previous developer session; application form can then be recreated
+- Prepared application: `VELNEST TwitchCon 2026`, Website Integration, Confidential, callback `http://localhost:3001/auth/twitch/callback`. No client ID/secret has been created or configured by this pass.
 
 ## Local tools
 
@@ -52,13 +52,19 @@ Before the first push, tracked-file history names were checked for private confi
 ## Submission progress and remaining work
 
 1. The Devpost name and pitch are saved. Project story, repository link, TypeScript/React tags and technical additional-info answers have been entered in the open forms, with a durable copy in [SUBMISSION.md](SUBMISSION.md). Those later steps are **not confirmed saved**: the details form requires a genuine demo video URL, and additional info still needs personal answers and eligibility declarations.
-2. The owner must supply country of residence and personal learning/Codex-reuse survey answers. Do not infer these from language, timezone or project activity. The owner must review eligibility declarations and any binding agreement at the actual submission step.
-3. Restore the Twitch Developer session, create/configure the confidential website application and complete live account authorization. A login handoff page is open in Chrome.
+2. The owner supplied the country and both survey answers. They have been entered in the fresh additional-info form; a private local backup is under ignored downloads/private, not the public repository. Residence in Quebec remains an open eligibility question because the official rules exclude that province separately. Age and affiliation declarations still require owner review. These form values have not been confirmed saved.
+3. Confirm creation of the prepared confidential Twitch application, configure its server-side credentials and complete real account authorization. The registered callback and server credentials must be handled without exposing the secret in chat or Git history.
 4. Record the actual project working on Twitch and the Codex workflow, upload the maximum-three-minute demonstration to YouTube, then complete the Devpost video field. The existing 12-second motion study is not a substitute.
-5. Upload project thumbnail/gallery images. An attempted Chrome file-chooser flow timed out before any files were selected; no media upload is claimed complete.
+5. Upload project thumbnail/gallery images. The visible Choose files button successfully opened a chooser, but the extension rejected setFiles because local-file URL access was disabled. A native fallback was then stopped by the computer-use tool because it could not confidently determine the browser URL. No media upload is claimed complete. The owner can instead select the prepared screenshots manually in Devpost.
 6. Review and finalize the entry. No final submission, eligibility declaration or binding agreement was submitted in this pass.
 
 Draft editor: https://devpost.com/submit-to/31742-codex-x-twitchcon-hackathon/manage/submissions/1268408-velnest/project-overview
+
+## Packaging and recording preparation
+
+The single-host startup path and three automated hosting tests are implemented; see DEPLOYMENT.md. Standalone runtime/browser smoke attempts were rejected by automatic approval, including the loopback-only attempt, with the sole reason `blocked by policy`. The previous local API was also not listening when checked, so a running local service is not currently assumed. START-VELNEST.cmd provides an owner-run development launcher and preserves existing .env configuration.
+
+The 100–120-second English recording plan is in DEMO-RUNBOOK.md. It requires actual Twitch footage and Codex usage, with any unverified feature disclosed. No livestream or YouTube upload has been started.
 
 ## Submission strategy
 

@@ -2,6 +2,7 @@ import cors from "@fastify/cors";
 import Fastify from "fastify";
 import { Server } from "socket.io";
 import { authConfigFromEnv, registerTwitchAuth, type AuthConfig } from './twitchAuth.js';
+import {registerFrontend} from './frontend.js';
 import {
   AVATARS,
   ACTIONS,
@@ -19,11 +20,12 @@ import {
 } from "@velnest/shared";
 
 /** Each runtime or integration test owns an isolated room and session store. */
-export async function createRoomServer(config: AuthConfig = authConfigFromEnv(), dependencies: { fetch?: typeof fetch; now?: () => number; logger?: boolean } = {}) {
+export async function createRoomServer(config: AuthConfig = authConfigFromEnv(), dependencies: { fetch?: typeof fetch; now?: () => number; logger?: boolean; frontendRoot?:string } = {}) {
 const webOrigin = config.webOrigin;
 const app = Fastify({ logger: dependencies.logger===false ? false : { serializers: { req: req => ({ method: req.method, url: req.url?.split('?')[0], hostname: req.hostname, remoteAddress: req.ip }) } } });
 
 await app.register(cors, { origin: webOrigin, credentials: true });
+if(dependencies.frontendRoot) await registerFrontend(app,dependencies.frontendRoot);
 const auth = registerTwitchAuth(app, config, dependencies);
 
 app.get("/health", async () => ({ ok: true, service: "velnest-realtime" }));

@@ -5,5 +5,8 @@ import { createRoomServer } from './roomServer.js';
 
 const envFile = fileURLToPath(new URL('../../../.env', import.meta.url));
 if (existsSync(envFile)) loadEnvFile(envFile);
-const { app } = await createRoomServer();
-await app.listen({ port: Number(process.env.PORT ?? 3001), host: '0.0.0.0' });
+const serveWeb=process.argv.includes('--serve-web') || process.env.NODE_ENV==='production';
+if(serveWeb && !process.env.WEB_ORIGIN) process.env.WEB_ORIGIN=`http://localhost:${process.env.PORT??3001}`;
+const frontendRoot=serveWeb?fileURLToPath(new URL('../../web/dist/',import.meta.url)):undefined;
+const { app } = await createRoomServer(undefined,{frontendRoot});
+await app.listen({ port: Number(process.env.PORT ?? 3001), host: process.env.BIND_ADDRESS ?? '0.0.0.0' });

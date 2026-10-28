@@ -6,7 +6,7 @@ The local room runs in demo mode by default. Real mode uses server-side authoriz
 
 1. Create a confidential website application in the Twitch Developer Console. Register the exact callback `http://localhost:3001/auth/twitch/callback` for local use.
 2. Copy `.env.example` to `.env` in the repository root. Fill in the application client ID, secret, and numeric broadcaster ID. Never commit `.env` or put the secret in a `VITE_` variable.
-3. Set `MOCK_MODE=false`, leaving `WEB_ORIGIN=http://localhost:5173` and `VITE_REALTIME_URL=http://localhost:3001` for the standard local ports.
+3. Set `MOCK_MODE=false`, leaving `WEB_ORIGIN=http://localhost:5173` for the standard local ports. A blank `VITE_REALTIME_URL` uses localhost:3001 in development and the current site origin in the compiled single-host app.
 4. Restart `pnpm dev`. The entry screen changes from Local demo to Twitch community. Connect with Twitch, approve the subscription-read permission, and return to choose a character.
 
 The configured broadcaster must be an affiliate or partner for Twitch's subscriber-check endpoint. A signed-in non-subscriber can watch but cannot control an avatar. If no credentials are present in real mode, entry stays disabled and the page says the Twitch connection is pending.
