@@ -6,6 +6,7 @@ import {
   ACTIONS,
   COSMETICS,
   SEATS,
+  ROOM_CAPACITY,
   type SeatId,
   type CosmeticId,
   type ActionId,
@@ -41,7 +42,7 @@ function World({ participants, connected, connecting=false, onNavigate, onSit, s
     <section id="community-world" className="world-shell" tabIndex={-1} aria-label="VELNEST shared world">
       <div className="world-topline">
         {connected ? "Connected to the nest" : connecting ? 'Connecting to the nest…' : 'Live room unavailable'}
-        <span>{connected ? `${participants.length} inside` : 'Occupancy unavailable'}</span>
+        <span role="status">{connected ? `${participants.length} / ${ROOM_CAPACITY} inside` : 'Occupancy unavailable'}</span>
       </div>
       <div className="world">
         <SceneBoundary><Suspense fallback={<div className="room-loading" role="status">Opening the room…</div>}>
@@ -150,7 +151,8 @@ export function App() {
   const [accountLoading,setAccountLoading]=useState(true);
   const [accountError,setAccountError]=useState('');
   const [interactionMessage,setInteractionMessage]=useState('');
-  const [roomError,setRoomError]=useState(()=>authMessages[new URLSearchParams(location.search).get('auth')??'']??'');
+  const [roomFailure,setRoomFailure]=useState<{code?:string;message:string}>(()=>({message:authMessages[new URLSearchParams(location.search).get('auth')??'']??''}));
+  const roomError=roomFailure.message;
   const joinedProfile = useRef<{ displayName: string; avatarId: AvatarId; cosmetic: CosmeticId } | null>(null);
 
   useEffect(()=>{
@@ -192,9 +194,12 @@ export function App() {
       }
     };
     const onDisconnect = () => setConnected(false);
-    const onRoomState = (state: Participant[]) => setParticipants(state);
+    const onRoomState = (state: Participant[]) => {
+      setParticipants(state);
+      if(state.length<ROOM_CAPACITY) setRoomFailure(error=>error.code==='room_full'?{message:''}:error);
+    };
     const onRoomError: ServerToClientEvents['roomError'] = error => {
-      setRoomError(error.message); joinedProfile.current=null; setJoined(false);
+      setRoomFailure(error); joinedProfile.current=null; setJoined(false);
       setAccountAttempt(attempt=>attempt+1);
     };
     if (!socket.connected) socket.connect();
@@ -247,13 +252,14 @@ export function App() {
   }, [joined, socket]);
 
   const join = () => {
-    if(accountLoading || accountError || !roomConfig || !connected || (!roomConfig.mockMode && (!account || account.role==='viewer'))) return;
-    setRoomError('');
+    if(accountLoading || accountError || !roomConfig || !connected || participants.length>=ROOM_CAPACITY || (!roomConfig.mockMode && (!account || account.role==='viewer'))) return;
+    setRoomFailure({message:''});
     joinedProfile.current = { displayName, avatarId, cosmetic };
     socket.emit("joinRoom", joinedProfile.current);
     setJoined(true);
   };
   const selfParticipant=participants.find(person=>person.id===socket.id);
+  const roomFull=connected && participants.length>=ROOM_CAPACITY;
   const requestSeat=(seatId:SeatId)=>{ setInteractionMessage(''); socket.emit('sit',seatId); showWorld(); };
   const unavailable=Boolean(accountError)||(!connected&&!accountLoading);
   const connecting=!connected&&accountLoading&&!accountError;
@@ -269,7 +275,7 @@ export function App() {
       socket.emit('leaveRoom'); joinedProfile.current=null; setJoined(false); setAccount(null);
       // Reconnect so the socket handshake carries the cleared session cookie.
       socket.disconnect(); socket.connect();
-    } catch { setRoomError('Sign-out could not finish. Please try again.'); }
+    } catch { setRoomFailure({message:'Sign-out could not finish. Please try again.'}); }
     finally { setAccountLoading(false); }
   };
 
@@ -330,10 +336,10 @@ export function App() {
             </label>
             {roomConfig && !roomConfig.mockMode && !account && roomConfig.oauthConfigured && connected && !accountLoading && !accountError ?
               <a className="enter-button twitch-signin" href={`${realtimeUrl}/auth/twitch`}>Connect with Twitch</a> :
-              <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || !roomConfig || (!roomConfig.mockMode && (!account || account.role==='viewer'))} type="button">
-                {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : 'Enter the room'}
+              <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || roomFull || !roomConfig || (!roomConfig.mockMode && (!account || account.role==='viewer'))} type="button">
+                {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : roomFull ? 'Room full' : 'Enter the room'}
               </button>}
-            <p className="demo-note">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : account?.role==='broadcaster' ? 'Your channel, your room. Join in or manage participants below.' : account ? 'Your subscription is verified. Choose a character and enter.' : 'Sign in to verify your place in the channel community.'}</p>
+            <p className="demo-note" role="status">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomFull ? `All ${ROOM_CAPACITY} places are in use. You can watch here; entry reopens when someone leaves.` : roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : account?.role==='broadcaster' ? 'Your channel, your room. Join in or manage participants below.' : account ? 'Your subscription is verified. Choose a character and enter.' : 'Sign in to verify your place in the channel community.'}</p>
             <details className="preview-details" onToggle={event=>setPreviewOpen(event.currentTarget.open)}>
               <summary>Inspect character and animations</summary>
               {previewOpen && <SceneBoundary><Suspense fallback={<div className="preview-loading" role="status">Opening character preview…</div>}><AvatarPreview avatarId={avatarId} cosmetic={cosmetic} /></Suspense></SceneBoundary>}

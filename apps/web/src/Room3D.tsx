@@ -6,8 +6,9 @@ import { attachCosmetic } from './cosmetics';
 import { createAnimator } from './animation';
 import { dispose3D } from './dispose3D';
 import { createRoomMotion } from './roomMotion';
+import {placeRoomLabel,type LabelBox} from './labelLayout';
 
-type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; cosmetic: string };
+type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; labelHeight: number; cosmetic: string };
 
 export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, selfId }: { participants: Participant[]; occupancyKnown?:boolean; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
   const host = useRef<HTMLDivElement>(null);
@@ -129,8 +130,9 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
         camera.lookAt(0,0,0);
       }
       actors.forEach((actor,id) => { if (!ids.has(id)) { scene.remove(actor.model); actor.mixer.stopAllAction(); disposeModel(actor.model); actor.label.remove(); actors.delete(id); } });
-      const placedLabels: {x:number;y:number;width:number}[]=[];
-      for (const p of people.current) {
+      const placedLabels:LabelBox[]=[];
+      const ordered=[...people.current].sort((a,b)=>Number(b.id===self.current)-Number(a.id===self.current) || Number(Boolean(b.action))-Number(Boolean(a.action)) || a.id.localeCompare(b.id));
+      for (const p of ordered) {
         let actor = actors.get(p.id);
         if (!actor && !pending.has(p.id) && !failed.has(p.id)) {
           pending.add(p.id);
@@ -139,6 +141,7 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
             if (disposed || !people.current.some(person=>person.id===p.id)) { disposeModel(gltf.scene); return; }
             const label = document.createElement('span');
             label.className='room-nameplate';
+            label.setAttribute('aria-hidden','true');
             label.textContent=p.displayName;
             el.appendChild(label);
             gltf.scene.traverse(obj=>{ if(obj instanceof THREE.Mesh) obj.castShadow=true; });
@@ -149,7 +152,7 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
             motion.emit('arrival',gltf.scene.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
             attachCosmetic(gltf.scene,p.cosmetic);
             const mixer=new THREE.AnimationMixer(gltf.scene);
-            actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,labelWidth:0,cosmetic:p.cosmetic});
+            actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,labelWidth:0,labelHeight:0,cosmetic:p.cosmetic});
           },undefined,()=>{ pending.delete(p.id); failed.add(p.id); setError('A character could not load. Reload the room to retry.'); });
         }
         actor = actors.get(p.id);
@@ -169,21 +172,22 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
           actor.label.dataset.action=p.action??'';
           actor.label.textContent=p.seat?.status==='seated' ? `${p.displayName} (seated)` : p.action ? `${p.displayName} (${p.action})` : p.displayName;
           actor.labelWidth=actor.label.offsetWidth;
+          actor.labelHeight=actor.label.offsetHeight;
           actor.animate(action,reduced.matches);
         }
         if(!reduced.matches) actor.mixer.update(dt);
         const screen=actor.model.position.clone().add(new THREE.Vector3(0,1.2,0)).project(camera);
         const x=(screen.x*.5+.5)*el.clientWidth;
         const anchorY=(-screen.y*.5+.5)*el.clientHeight;
-        let y=anchorY;
-        for(let attempt=0;attempt<people.current.length;attempt++) {
-          const overlap=placedLabels.find(label=>Math.abs(x-label.x)<(actor.labelWidth+label.width)/2+6 && Math.abs(y-label.y)<26);
-          if(!overlap) break;
-          y=overlap.y-28;
+        const box=screen.z>=-1&&screen.z<=1?placeRoomLabel({x,y:anchorY},{width:actor.labelWidth,height:actor.labelHeight},{width:el.clientWidth,height:el.clientHeight},placedLabels):null;
+        actor.label.style.visibility=box?'visible':'hidden';
+        if(box){
+          placedLabels.push(box);
+          const dx=x-box.x,dy=anchorY-box.y;
+          actor.label.style.setProperty('--leader-height',`${Math.hypot(dx,dy)}px`);
+          actor.label.style.setProperty('--leader-angle',`${-Math.atan2(dx,dy)}rad`);
+          actor.label.style.transform=`translate(-50%,-100%) translate(${box.x}px,${box.y}px)`;
         }
-        placedLabels.push({x,y,width:actor.labelWidth});
-        actor.label.style.setProperty('--leader-height',`${anchorY-y}px`);
-        actor.label.style.transform=`translate(-50%,-100%) translate(${x}px,${y}px)`;
       }
       motion.update(dt,reduced.matches);
       renderer.render(scene,camera);
@@ -193,6 +197,7 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
     return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
   },[]);
   return <div className="room-3d" ref={host} aria-label={occupancyKnown?`3D community room with ${participants.length} participants`:'3D community room preview; occupancy unavailable'}>
+    {occupancyKnown && <ul className="visually-hidden" aria-label="People inside">{participants.map(person=><li key={person.id}>{person.displayName}{person.seat?.status==='seated'?' (seated)':person.action?` (${person.action})`:''}</li>)}</ul>}
     {error && <p className="room-error" role="alert">{error}</p>}
   </div>;
 }

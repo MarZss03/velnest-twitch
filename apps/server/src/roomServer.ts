@@ -7,6 +7,7 @@ import {
   ACTIONS,
   COSMETICS,
   SEATS,
+  ROOM_CAPACITY,
   canOccupy,
   moveInRoom,
   findRoomPath,
@@ -165,6 +166,11 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", (payload) => {
     if (!payload || typeof payload.displayName!=='string' || typeof payload.avatarId!=='string' || !allowedAvatarIds.has(payload.avatarId)) return;
+    // Checked synchronously with insertion: competing joins cannot overbook.
+    if(!participants.has(socket.id) && participants.size>=ROOM_CAPACITY) {
+      socket.emit('roomError',{code:'room_full',message:`The room is full (${ROOM_CAPACITY} places). You can watch here and enter when someone leaves.`});
+      return;
+    }
     const now=Date.now();
     if(now-lastJoin<300) return;
     lastJoin=now;

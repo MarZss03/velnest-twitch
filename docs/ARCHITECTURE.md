@@ -54,7 +54,9 @@ The public repository has been freshly cloned, installed with its frozen lockfil
 
 Live Twitch account authorization, subscriber/broadcaster walkthrough and final broadcast demonstration remain unverified. Hosting should place frontend and API on the same HTTPS site, with the exact registered callback and origin. The default local URLs require explicit network-address configuration before a physical phone can connect.
 
-An explicit room-capacity limit, broader ingress limits and physical-device load profiling remain deployment work. Existing movement/action/join limits and effect caps do not establish arbitrary public-room scale. Assets are fixed and allow-listed; user-uploaded models remain outside this MVP.
+The single-room MVP admits at most 24 avatars, counting the broadcaster if they enter. The server synchronously checks capacity before inserting membership, so competing joins cannot overbook. Full-room connections remain observers. Leaving, disconnecting or removal releases capacity; the controller re-enables entry when an updated snapshot contains space. Rejoining on an existing socket does not consume another place. The broadcaster can manage the room without entering an avatar.
+
+Broader ingress limits and physical-device load profiling remain deployment work. The admission ceiling is a product policy, not evidence that 24 avatars meet a particular frame-rate or public-traffic target. Existing movement/action/join limits and effect caps do not establish arbitrary public-room scale. Assets are fixed and allow-listed; user-uploaded models remain outside this MVP.
 
 ## Current ports
 

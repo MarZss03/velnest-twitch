@@ -14,6 +14,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - three reservable sofa seats with walk-to-seat, Blender-authored sitting and standing transitions;
 - server-side Twitch OAuth, subscriber verification and expiring sessions.
 - broadcaster-only removal with a five-minute identity timeout.
+- a 24-character admission limit, with full-room spectating and automatic entry availability when a place opens.
 
 Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). Until credentials are configured and a live account walkthrough succeeds, the Twitch integration is not considered verified against Twitch itself.
 
@@ -53,6 +54,8 @@ pnpm test:room
 pnpm test:animations
 pnpm test:motion
 pnpm test:seating
+pnpm test:capacity
+pnpm test:labels
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.

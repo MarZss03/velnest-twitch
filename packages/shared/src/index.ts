@@ -48,9 +48,12 @@ export type MovePayload = {
   dy: number;
 };
 
+/** Admission ceiling for the single-room MVP; observers do not consume places. */
+export const ROOM_CAPACITY = 24;
+
 export type ServerToClientEvents = {
   interactionError: (message: string) => void;
-  roomError: (error: { code: 'sign_in_required' | 'subscription_required' | 'room_removed'; message: string }) => void;
+  roomError: (error: { code: 'sign_in_required' | 'subscription_required' | 'room_removed' | 'room_full'; message: string }) => void;
   roomState: (participants: Participant[]) => void;
 };
 
