@@ -98,6 +98,7 @@ export function App() {
   const [displayName, setDisplayName] = useState(() => `Nestling${Math.floor(10 + Math.random() * 90)}`);
   const [avatarId, setAvatarId] = useState<AvatarId>("riff");
   const [cosmetic, setCosmetic] = useState<CosmeticId>('none');
+  const [previewOpen,setPreviewOpen]=useState(false);
   const joinedProfile = useRef<{ displayName: string; avatarId: AvatarId; cosmetic: CosmeticId } | null>(null);
 
   useEffect(() => {
@@ -181,7 +182,6 @@ export function App() {
 
           <div className="join-card">
             <h2>Make an entrance.</h2>
-            <AvatarPreview avatarId={avatarId} cosmetic={cosmetic} />
             <label>
               <span>Your name</span>
               <input value={displayName} maxLength={20} onChange={(event) => setDisplayName(event.target.value)} />
@@ -213,6 +213,10 @@ export function App() {
               Enter the room
             </button>
             <p className="demo-note">Try the room with a demo name. Twitch sign-in is coming next.</p>
+            <details className="preview-details" onToggle={event=>setPreviewOpen(event.currentTarget.open)}>
+              <summary>Inspect character and animations</summary>
+              {previewOpen && <AvatarPreview avatarId={avatarId} cosmetic={cosmetic} />}
+            </details>
           </div>
         </section>
       ) : (

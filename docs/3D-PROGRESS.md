@@ -12,6 +12,9 @@ Browser review has confirmed the room and character rendering, mobile entry, and
 
 ## Latest verification
 
+- Fresh desktop review after CSS consolidation found the entrance action below the first viewport. Moved the optional rotating animation inspector into a native disclosure after the entry controls; it mounts its WebGL preview only when expanded.
+- Follow-up screenshot showed the primary entry action in the first viewport. Browser actions verified disclosure expansion, Cheer control, collapse, entry, and leave back to the selector with presence returning to zero.
+
 - Runtime audit found unchecked socket payloads could throw on null input, and the selector's WebGL construction had no fallback. Added payload validation, manual movement/action cadence limits, and a non-crashing preview-unavailable state. A socket check sent malformed join/move/destination payloads followed by a valid join; the valid join succeeded. Type, room-path and animation checks passed.
 
 - Character selection now uses a transparent Blender render of the actual skinned assets. Inspected the generated lineup; original concept images remain reference only.

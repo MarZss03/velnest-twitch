@@ -51,6 +51,9 @@ input,select { width: 100%; border: 1px solid var(--room-line); border-radius: 8
 .demo-note { color: var(--room-muted); font-size: 12px; line-height: 1.6; }
 .cosmetic-picker { margin-top: 20px; }
 .character-canvas { height: 170px; touch-action: none; cursor: grab; }
+.preview-details { margin-top: 20px; border-top: 1px solid var(--room-line); padding-top: 12px; }
+.preview-details summary { cursor: pointer; color: var(--room-muted); font-size: 13px; min-height: 44px; padding: 12px 0; }
+.preview-details summary:focus-visible { outline: 3px solid var(--room-accent); outline-offset: 4px; }
 .character-canvas:active { cursor: grabbing; }
 canvas { display: block; }
 .character-preview p { color: var(--room-muted); font-size: 12px; text-align: center; }

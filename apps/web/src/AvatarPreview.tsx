@@ -30,6 +30,7 @@ export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: Avata
     light.position.set(2, 4, 3);
     scene.add(light);
     const resize = new ResizeObserver(() => {
+      if(!el.clientWidth || !el.clientHeight) return;
       renderer.setSize(el.clientWidth, el.clientHeight);
       camera.aspect = el.clientWidth / el.clientHeight;
       camera.updateProjectionMatrix();
