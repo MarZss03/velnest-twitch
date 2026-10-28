@@ -52,7 +52,7 @@ async function fixture(t, overrides={}) {
     return {response,cookie:sessionCookie?pair(sessionCookie):undefined,start};
   }
   async function connect(cookie) {
-    await server.app.listen({port:0,host:'127.0.0.1'});
+    if(!server.app.server.listening) await server.app.listen({port:0,host:'127.0.0.1'});
     const address=server.app.server.address();
     const socket=io(`http://127.0.0.1:${address.port}`,{autoConnect:false,transports:['websocket'],extraHeaders:{Origin:config.webOrigin,...(cookie?{Cookie:cookie}:{})}});
     t.after(()=>socket.disconnect());
@@ -148,4 +148,57 @@ test('unconfigured real mode exposes no sign-in redirect or accidental mock acce
   const f=await fixture(t,{config:{clientId:'',clientSecret:'',broadcasterId:''}});
   assert.deepEqual((await f.app.inject('/api/config')).json(),{mockMode:false,oauthConfigured:false,room:'twitch'});
   assert.equal((await f.app.inject('/auth/twitch')).statusCode,503);
+});
+
+test('broadcaster removal clears every identity connection, releases seats and survives reconnect until expiry',async t=>{
+  const f=await fixture(t);
+  const subscriber=await f.login();
+  f.state.userId='900'; const broadcaster=await f.login();
+  const owner=await f.connect(broadcaster.cookie);
+  const guest=await f.connect(subscriber.cookie);
+  const otherTab=await f.connect(subscriber.cookie);
+  const observer=await f.connect();
+  let changed=event(observer,'roomState',people=>people.length===1);
+  guest.emit('joinRoom',{displayName:'Guest',avatarId:'riff'}); await changed;
+  changed=event(observer,'roomState',people=>people.length===2);
+  otherTab.emit('joinRoom',{displayName:'Guest tab',avatarId:'arc'}); await changed;
+  // Use the source seat ID rather than a UI label.
+  const {SEATS}=await import('../../../packages/shared/dist/index.js');
+  const seat=SEATS[1].id;
+  changed=event(observer,'roomState',people=>people.some(person=>person.seat?.id===seat));
+  guest.emit('sit',seat); await changed;
+  const deniedGuest=await guest.timeout(1000).emitWithAck('removeParticipant',otherTab.id);
+  assert.equal(deniedGuest.ok,false,'subscriber must not moderate');
+  const removed=event(guest,'roomError'); const otherRemoved=event(otherTab,'roomError');
+  changed=event(observer,'roomState',people=>people.length===0);
+  const result=await owner.timeout(1000).emitWithAck('removeParticipant',guest.id);
+  assert.equal(result.ok,true); assert.equal((await removed).code,'room_removed');
+  assert.equal((await otherRemoved).code,'room_removed'); await changed;
+  const blocked=event(guest,'roomError'); guest.emit('joinRoom',{displayName:'Retry',avatarId:'muse'});
+  assert.equal((await blocked).code,'room_removed');
+  const fresh=await f.connect(subscriber.cookie);
+  const blockedReconnect=event(fresh,'roomError'); fresh.emit('joinRoom',{displayName:'Reconnect',avatarId:'riff'});
+  assert.equal((await blockedReconnect).code,'room_removed');
+  f.state.userId='100'; const newLogin=await f.login(); const relogged=await f.connect(newLogin.cookie);
+  const blockedLogin=event(relogged,'roomError'); relogged.emit('joinRoom',{displayName:'New login',avatarId:'riff'});
+  assert.equal((await blockedLogin).code,'room_removed');
+  f.advance(5*60_000+1);
+  changed=event(observer,'roomState',people=>people.length===1);
+  relogged.emit('joinRoom',{displayName:'After timeout',avatarId:'muse'}); await changed;
+  changed=event(observer,'roomState',people=>people[0]?.seat?.id===seat);
+  relogged.emit('sit',seat); await changed;
+  const gone=await owner.timeout(1000).emitWithAck('removeParticipant','not-a-socket'); assert.equal(gone.ok,false);
+  changed=event(observer,'roomState',people=>people.length===2);
+  owner.emit('joinRoom',{displayName:'Owner',avatarId:'arc'}); await changed;
+  const self=await owner.timeout(1000).emitWithAck('removeParticipant',owner.id);
+  assert.equal(self.ok,false,'broadcaster cannot timeout their own identity');
+  await f.app.inject({method:'POST',url:'/auth/logout',headers:{cookie:broadcaster.cookie,origin:config.webOrigin}});
+  const revoked=event(owner,'roomError'); owner.emit('removeParticipant',relogged.id,()=>assert.fail('revoked moderator must not succeed'));
+  assert.equal((await revoked).code,'sign_in_required');
+});
+
+test('demo identities cannot grant themselves moderation',async t=>{
+  const f=await fixture(t,{config:{mockMode:true}}); const socket=await f.connect();
+  const result=await socket.timeout(1000).emitWithAck('removeParticipant','fake');
+  assert.equal(result.ok,false);
 });

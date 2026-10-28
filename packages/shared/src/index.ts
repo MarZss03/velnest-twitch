@@ -50,7 +50,7 @@ export type MovePayload = {
 
 export type ServerToClientEvents = {
   interactionError: (message: string) => void;
-  roomError: (error: { code: 'sign_in_required' | 'subscription_required'; message: string }) => void;
+  roomError: (error: { code: 'sign_in_required' | 'subscription_required' | 'room_removed'; message: string }) => void;
   roomState: (participants: Participant[]) => void;
 };
 
@@ -61,6 +61,7 @@ export type SessionInfo = {
 export type RoomConfig = { mockMode: boolean; oauthConfigured: boolean; room: string };
 
 export type ClientToServerEvents = {
+  removeParticipant: (participantId: string, reply: (result: { ok: boolean; message: string }) => void) => void;
   sit: (seatId: SeatId) => void;
   stand: () => void;
   joinRoom: (payload: JoinPayload) => void;

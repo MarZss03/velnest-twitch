@@ -20,6 +20,7 @@ During a live stream, a verified subscriber can open a link on desktop or phone,
 - presence, name label, movement, Wave/Cheer/Dance animations and event-driven 3D effects
 - OBS-specific display mode
 - reconnect and basic rate limiting
+- broadcaster-only participant removal with a five-minute room timeout
 - mock mode for judging without live Twitch credentials
 
 ### Out
@@ -34,7 +35,7 @@ During a live stream, a verified subscriber can open a link on desktop or phone,
 
 Those are roadmap items, not Day 1 dependencies.
 
-The original Day 1 2D-only constraint was superseded by the owner's request for Blender 3D characters, animation and a 3D room. The current implementation and DESIGN.md reflect that direction. Twitch OAuth is implemented and tested against a simulated provider; live Twitch account verification and streamer moderation still need completion.
+The original Day 1 2D-only constraint was superseded by the owner's request for Blender 3D characters, animation and a 3D room. The current implementation and DESIGN.md reflect that direction. Twitch OAuth and broadcaster moderation are implemented and tested against a simulated provider. Live Twitch account verification and the real streamer walkthrough remain unfinished.
 
 ## Roles
 

@@ -108,6 +108,33 @@ function ActionBar({ onAction, active, disabled=false }: { onAction: (actionId: 
   );
 }
 
+function RoomManagement({participants,selfId,connected,onRemove}:{participants:Participant[];selfId?:string;connected:boolean;onRemove:(id:string)=>Promise<{ok:boolean;message:string}>}) {
+  const [confirming,setConfirming]=useState<string|null>(null);
+  const [pending,setPending]=useState(false);
+  const [message,setMessage]=useState('');
+  const heading=useRef<HTMLHeadingElement>(null);
+  const guests=participants.filter(person=>person.id!==selfId);
+  const remove=async(id:string)=>{
+    setPending(true); setMessage('');
+    try { const result=await onRemove(id); setMessage(result.message); }
+    catch { setMessage('Removal could not be confirmed. Check the room and try again.'); }
+    finally { setPending(false); setConfirming(null); heading.current?.focus({preventScroll:true}); }
+  };
+  return <section className="room-management" aria-label="Broadcaster room controls">
+    <h2 ref={heading} tabIndex={-1}>Manage the room</h2>
+    <p>Remove a participant for five minutes. They can still watch the stream.</p>
+    {!connected?<p>Reconnect to manage participants.</p>:guests.length===0?<p>No other participants inside.</p>:<ul>{guests.map(person=><li key={person.id}>
+      <span className="managed-name">{person.displayName}</span>
+      {confirming===person.id?<div className="remove-confirmation">
+        <p>Remove {person.displayName} for five minutes?</p>
+        <button type="button" disabled={pending} onClick={()=>void remove(person.id)}>{pending?'Removing…':'Confirm removal'}</button>
+        <button type="button" disabled={pending} onClick={()=>setConfirming(null)}>Cancel</button>
+      </div>:<button type="button" disabled={pending} aria-label={`Remove ${person.displayName}`} onClick={()=>{setMessage('');setConfirming(person.id);}}>Remove</button>}
+    </li>)}</ul>}
+    <p role="status">{message}</p>
+  </section>;
+}
+
 export function App() {
   const socket = useMemo<VelnestSocket>(() => io(realtimeUrl, { autoConnect: false, withCredentials: true }), []);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -232,6 +259,7 @@ export function App() {
   const connecting=!connected&&accountLoading&&!accountError;
   const connectionMessage=accountError||(!connected&&!accountLoading?'The live room is offline. Retry the connection to enter.':'');
   const retryConnection=()=>{setAccountAttempt(attempt=>attempt+1);socket.connect();};
+  const management=account?.role==='broadcaster'&&!roomConfig?.mockMode?<RoomManagement participants={participants} selfId={socket.id} connected={connected} onRemove={id=>socket.timeout(5000).emitWithAck('removeParticipant',id)}/>:null;
 
   const signOut=async()=>{
     setAccountLoading(true);
@@ -305,11 +333,12 @@ export function App() {
               <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || !roomConfig || (!roomConfig.mockMode && (!account || account.role==='viewer'))} type="button">
                 {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : 'Enter the room'}
               </button>}
-            <p className="demo-note">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : 'Sign in to verify your place in the channel community.'}</p>
+            <p className="demo-note">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : account?.role==='broadcaster' ? 'Your channel, your room. Join in or manage participants below.' : account ? 'Your subscription is verified. Choose a character and enter.' : 'Sign in to verify your place in the channel community.'}</p>
             <details className="preview-details" onToggle={event=>setPreviewOpen(event.currentTarget.open)}>
               <summary>Inspect character and animations</summary>
               {previewOpen && <SceneBoundary><Suspense fallback={<div className="preview-loading" role="status">Opening character preview…</div>}><AvatarPreview avatarId={avatarId} cosmetic={cosmetic} /></Suspense></SceneBoundary>}
             </details>
+            {management}
           </div>
         </section>
       ) : (
@@ -352,6 +381,7 @@ export function App() {
               <span>OBS browser source</span>
               <code>{overlayUrl}</code>
             </div>
+            {management}
           </aside>
         </section>
       )}

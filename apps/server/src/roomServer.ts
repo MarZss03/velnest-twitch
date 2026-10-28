@@ -33,6 +33,11 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(app.server, {
 });
 
 const participants = new Map<string, Participant>();
+// Timeouts belong to verified Twitch identities, so new sockets and fresh logins
+// cannot bypass a broadcaster's room decision. They expire with this process.
+const roomTimeouts = new Map<string, number>();
+const now = dependencies.now ?? Date.now;
+const removalMessage = 'The broadcaster removed you from the room for five minutes. You can still watch.';
 const allowedAvatarIds = new Set<string>(AVATARS.map((avatar) => avatar.id));
 const allowedActionIds = new Set<string>(ACTIONS.map((action) => action.id));
 
@@ -55,16 +60,44 @@ io.on("connection", (socket) => {
   };
   const denyAccess = () => {
     const user=auth.sessionForCookie(socket.request.headers.cookie)?.user;
-    if(config.mockMode || (user && user.role !== 'viewer')) return false;
+    const timeout=user ? roomTimeouts.get(user.id) : undefined;
+    const removed=Boolean(timeout && timeout>now());
+    if(user && timeout && !removed) roomTimeouts.delete(user.id);
+    if(config.mockMode || (user && user.role !== 'viewer' && !removed)) return false;
     const existed=participants.delete(socket.id);
     route=[];
     if(existed) emitRoomState();
-    socket.emit('roomError', { code: user ? 'subscription_required' : 'sign_in_required', message: user ? 'This room is for channel subscribers. You can still watch the room.' : 'Sign in with Twitch to enter the room.' });
+    socket.emit('roomError', { code: removed ? 'room_removed' : user ? 'subscription_required' : 'sign_in_required', message: removed ? removalMessage : user ? 'This room is for channel subscribers. You can still watch the room.' : 'Sign in with Twitch to enter the room.' });
     return true;
   };
   socket.use(([event], next) => {
     if(event !== 'leaveRoom' && denyAccess()) return;
     next();
+  });
+  socket.on('removeParticipant',(participantId,reply)=>{
+    const respond=(ok:boolean,message:string)=>{
+      if(typeof reply==='function') reply({ok,message});
+      else socket.emit('interactionError',message);
+    };
+    const moderator=auth.sessionForCookie(socket.request.headers.cookie)?.user;
+    if(config.mockMode || moderator?.role!=='broadcaster' || moderator.id!==config.broadcasterId) {
+      respond(false,'Only this channel’s broadcaster can remove participants.'); return;
+    }
+    const target=typeof participantId==='string' ? io.sockets.sockets.get(participantId) : undefined;
+    const targetUser=target && auth.sessionForCookie(target.request.headers.cookie)?.user;
+    if(!target || !targetUser || !participants.has(participantId)) {
+      respond(false,'That participant has already left.'); return;
+    }
+    if(targetUser.id===moderator.id) { respond(false,'You cannot remove your own broadcaster identity.'); return; }
+    for(const [id,expiry] of roomTimeouts) if(expiry<=now()) roomTimeouts.delete(id);
+    roomTimeouts.set(targetUser.id,now()+5*60_000);
+    for(const peer of io.sockets.sockets.values()) {
+      if(auth.sessionForCookie(peer.request.headers.cookie)?.user.id!==targetUser.id) continue;
+      participants.delete(peer.id);
+      peer.emit('roomError',{code:'room_removed',message:removalMessage});
+    }
+    emitRoomState();
+    respond(true,`${targetUser.displayName} was removed for five minutes.`);
   });
   const navigation=setInterval(()=>{
     const participant=participants.get(socket.id);

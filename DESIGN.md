@@ -23,6 +23,8 @@ The three sofa cushions are interactive targets with an equivalent keyboard-acce
 
 ## Skill application and limits
 
+Broadcaster management lives below the existing identity/control rail. It uses a plain participant list and an inline removal confirmation, with a live result and focus returning to the heading after completion. The room remains visible while the host manages it. The server exclusively decides moderator authority and timeout duration; demo mode does not expose pretend administration.
+
 Impeccable informed artifact-led hierarchy, browser inspection and corrective passes. Hallmark informed explicit tokens, visible focus, restrained copy and reduced-motion fallbacks. Taste informed replacing the generic marketing splash with the product in use. UI UX Pro Max supplied gaming/3D direction and accessible control guidance. HyperFrames now supplies an editable 12-second 1080p motion study using the actual Blender GLBs, character clips and shared pathfinding, with deterministic seeking and a verified local MP4. These are working methods and local instructions, not model training.
 
 Manrope is self-hosted with six Unicode subsets and a Latin preload. The room and optional animation inspector load separately; scene loading failures offer a page reload. The initial application script is about 277 KB before compression; Three.js is split into separate core and renderer chunks.
