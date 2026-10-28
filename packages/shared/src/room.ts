@@ -26,3 +26,43 @@ export function moveInRoom(x: number, y: number, dx: number, dy: number) {
 export function floorHeight(x: number,z: number) {
   return x > .65 && x < 3.35 && z > -2.75 && z < -.85 ? .20 : .02;
 }
+
+type Point = {x:number;y:number};
+
+/** Sweep at sub-avatar spacing so a route cannot tunnel through thin corners. */
+export function clearSegment(a: Point,b: Point) {
+  const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/.3));
+  for(let i=0;i<=steps;i++) {
+    const t=i/steps;
+    if(!canOccupy(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t)) return false;
+  }
+  return true;
+}
+
+/** Shortest visibility-graph route around the room's expanded furniture boxes. */
+export function findRoomPath(start: Point,end: Point): Point[] {
+  if(!canOccupy(start.x,start.y)||!canOccupy(end.x,end.y)) return [];
+  if(clearSegment(start,end)) return [end];
+  const corners=obstacles.flatMap(box=>[
+    fromWorld(box.left-.04,box.back-.04),fromWorld(box.right+.04,box.back-.04),
+    fromWorld(box.left-.04,box.front+.04),fromWorld(box.right+.04,box.front+.04)
+  ]).filter(p=>canOccupy(p.x,p.y));
+  const points=[start,end,...corners];
+  const distance=points.map(()=>Infinity), previous=points.map(()=>-1), visited=new Set<number>();
+  distance[0]=0;
+  while(visited.size<points.length) {
+    let current=-1;
+    for(let i=0;i<points.length;i++) if(!visited.has(i)&&(current===-1||distance[i]<distance[current])) current=i;
+    if(current===-1||!Number.isFinite(distance[current])) return [];
+    if(current===1) break;
+    visited.add(current);
+    for(let i=0;i<points.length;i++) {
+      if(visited.has(i)||i===current||!clearSegment(points[current],points[i])) continue;
+      const cost=distance[current]+Math.hypot(points[i].x-points[current].x,points[i].y-points[current].y);
+      if(cost<distance[i]) {distance[i]=cost;previous[i]=current;}
+    }
+  }
+  const route: Point[]=[];
+  for(let i=1;i!==0;i=previous[i]) {if(i<0)return [];route.unshift(points[i]);}
+  return route;
+}

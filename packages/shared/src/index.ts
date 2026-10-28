@@ -1,4 +1,4 @@
-export { toWorld, fromWorld, canOccupy, moveInRoom, floorHeight } from './room.js';
+export { toWorld, fromWorld, canOccupy, moveInRoom, floorHeight, clearSegment, findRoomPath } from './room.js';
 
 export const AVATARS = [
   { id: "riff", name: "Riff", image: "/avatars/identity-lineup.png", position: "0% 50%", color: "#b59cff", accent: "#3b2a64" },

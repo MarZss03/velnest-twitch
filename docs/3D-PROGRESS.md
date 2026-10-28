@@ -13,7 +13,8 @@ Browser review confirmed the room and character render successfully. Remaining: 
 ## Latest verification
 
 - Furniture collision is authoritative in `packages/shared/src/room.ts`, matching the Afterparty sofa and table footprints with avatar clearance. Spawn points are checked and diagonal movement is normalized.
-- Click-to-walk raycasts the room floor, sends a bounded destination to the server, and moves at the same cadence as keyboard input. Manual input cancels the destination. This uses straight-line travel with obstacle sliding, not full pathfinding; a blocked route stops.
+- Click-to-walk raycasts the room floor, sends a bounded destination to the server, and moves at the same cadence as keyboard input. Manual input cancels the destination. A visibility graph now plans the shortest valid route around expanded furniture corners; segment sweeps reject paths through obstacles.
+- `pnpm test:room` checks coffee-table detours, collision-free paths across the room's reachable grid, and rejection of invalid targets. All three tests passed. A live socket check also verified traversal from one side of the coffee table to the other.
 - Stage elevation is applied to 3D actors. Direct checks passed furniture occupancy rejection, blocked movement, stage height, non-finite input rejection, and a Socket.IO moveTo arrival.
 
 - The authored Afterparty environment is built in Blender by `art/blender/build_room.py`: rounded upholstered sofa, cushions, coffee table, rug, stage, wall display, original VELNEST lettering, and potted plants. Editable source: `afterparty.blend`; web asset: `models/afterparty.glb`; inspected Cycles still: `art/blender/afterparty-preview.png`.

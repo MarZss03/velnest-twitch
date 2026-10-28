@@ -250,7 +250,7 @@ export function App() {
           <World participants={participants} connected={connected} onNavigate={position=>socket.emit('moveTo',position)} />
           <aside className="controller">
             <h2>Hey, {displayName}.</h2>
-            <p>Click the floor to walk. Use WASD, arrow keys, or hold the controls below. Furniture blocks your path.</p>
+            <p>Click the floor to walk around furniture. Use WASD, arrow keys, or hold the controls below to take over.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />
             <label className="cosmetic-picker">

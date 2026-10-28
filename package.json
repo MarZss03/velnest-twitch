@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "scripts": {
+    "test:room": "pnpm --filter @velnest/shared build && node --test packages/shared/tests/room.test.mjs",
     "dev": "concurrently -n server,web -c magenta,cyan \"pnpm --filter @velnest/server dev\" \"pnpm --filter @velnest/web dev\"",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck"

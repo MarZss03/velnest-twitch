@@ -7,6 +7,7 @@ import {
   COSMETICS,
   canOccupy,
   moveInRoom,
+  findRoomPath,
   type ActionId,
   type AvatarId,
   type ClientToServerEvents,
@@ -41,22 +42,25 @@ function cleanDisplayName(value: string) {
 }
 
 io.on("connection", (socket) => {
-  let destination: {x:number;y:number} | null=null;
+  let route: {x:number;y:number}[]=[];
   const navigation=setInterval(()=>{
     const participant=participants.get(socket.id);
+    const destination=route[0];
     if(!participant || !destination) return;
     const dx=destination.x-participant.x, dy=destination.y-participant.y;
     const length=Math.hypot(dx,dy);
-    if(length<.15) { destination=null; return; }
+    if(length<.15) { route.shift(); return; }
     const step=Math.min(length,2.25);
     const next=moveInRoom(participant.x,participant.y,dx/length*step,dy/length*step);
-    if(next.x===participant.x && next.y===participant.y) { destination=null; return; }
+    if(next.x===participant.x && next.y===participant.y) { route=[]; return; }
     participant.x=next.x; participant.y=next.y;
     emitRoomState();
   },70);
   socket.on('moveTo',position=>{
     if(!position || !canOccupy(position.x,position.y)) return;
-    destination={x:position.x,y:position.y};
+    const participant=participants.get(socket.id);
+    if(!participant) return;
+    route=findRoomPath(participant,position);
   });
   // Late-joining viewers—especially OBS Browser Sources—need the current
   // snapshot immediately instead of waiting for the next player event.
@@ -82,7 +86,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("move", ({ dx, dy }) => {
-    destination=null;
+    route=[];
     const participant = participants.get(socket.id);
     if (!participant) return;
 
