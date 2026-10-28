@@ -13,6 +13,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - event-driven 3D arrival, destination and reaction effects;
 - three reservable sofa seats with walk-to-seat, Blender-authored sitting and standing transitions;
 - server-side Twitch OAuth, subscriber verification and expiring sessions.
+- broadcaster-only removal with a five-minute identity timeout.
 
 Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). Until credentials are configured and a live account walkthrough succeeds, the Twitch integration is not considered verified against Twitch itself.
 
