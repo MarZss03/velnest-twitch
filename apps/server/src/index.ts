@@ -87,6 +87,13 @@ io.on("connection", (socket) => {
     }, 1600);
   });
 
+  socket.on('changeCosmetic', (cosmetic) => {
+    const participant = participants.get(socket.id);
+    if (!participant || !COSMETICS.some(item => item.id === cosmetic)) return;
+    participant.cosmetic = cosmetic;
+    emitRoomState();
+  });
+
   socket.on("disconnect", () => {
     participants.delete(socket.id);
     emitRoomState();

@@ -14,7 +14,9 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 - Shared headphones, backpack, and lightstick attach through identical named GLB sockets. The selection is shown in the 3D preview and included in authoritative room state, including reconnect joins.
 - GLB node inspection verified Head, slot_back, and slot_hand_R exist on every identity. Socket client verification passed persistence of a valid cosmetic and fallback to Original for an untrusted ID.
-- Cosmetic geometry is currently authored in Three.js socket coordinates; Blender-authored prop meshes and visual clipping review are still pending.
+- Prop source now lives in `art/blender/build_props.py`, with editable headphones, backpack, and lightstick `.blend` files and exported GLBs under `apps/web/public/models/props/`. The renderer loads these assets into the shared socket frame and retains a geometric fallback on load failure.
+- In-room accessory selection broadcasts `changeCosmetic` without resetting position or identity. A socket check verified consecutive live changes from Original to Backpack to Lightstick. Old prop geometry is disposed during replacement.
+- Visual clipping review of every prop on every identity remains pending.
 
 - Walk clips exported and inspected in all three GLBs.
 - Keyboard movement uses a fixed 70 ms input cadence with normalized diagonals; blur and key-up stop movement. Touch controls repeat while held and stop on release, cancellation, lost capture, or window blur.

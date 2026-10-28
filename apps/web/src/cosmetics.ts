@@ -1,13 +1,31 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { CosmeticId } from '@velnest/shared';
 
 /** Every item is authored in shared socket coordinates, never per-avatar offsets. */
 export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
+  const oldItems: THREE.Object3D[]=[];
+  model.traverse(obj => { if (obj.name.startsWith('cosmetic_')) oldItems.push(obj); });
+  oldItems.forEach(obj => {
+    obj.visible=false;
+    obj.removeFromParent();
+    obj.traverse(child => { if(child instanceof THREE.Mesh) { child.geometry.dispose(); (Array.isArray(child.material)?child.material:[child.material]).forEach(material=>material.dispose()); } });
+  });
   const slot = id === 'headphones' ? 'Head' : id === 'backpack' ? 'slot_back' : 'slot_hand_R';
   const parent = model.getObjectByName(slot);
   if (!parent || id === 'none') return;
   const item = new THREE.Group();
   item.name = `cosmetic_${id}`;
+  parent.add(item);
+  new GLTFLoader().load(`/models/props/${id}.glb`, gltf => {
+    if (!item.visible || !item.parent || !model.parent) {
+      gltf.scene.traverse(child=>{if(child instanceof THREE.Mesh){child.geometry.dispose();(Array.isArray(child.material)?child.material:[child.material]).forEach(material=>material.dispose());}});
+      return;
+    }
+    gltf.scene.rotation.x=Math.PI/2;
+    item.add(gltf.scene);
+    item.children.filter(child=>child!==gltf.scene).forEach(child=>{child.visible=false;});
+  },undefined,()=>{ /* Keep the geometric fallback if the authored asset cannot load. */ });
   const material = new THREE.MeshStandardMaterial({color: '#a6e2c5', roughness: .55});
   const add = (geometry: THREE.BufferGeometry, x: number, y: number, z: number) => {
     const mesh = new THREE.Mesh(geometry, material);
@@ -28,5 +46,4 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
     stick.rotation.x=Math.PI/2;
     add(new THREE.SphereGeometry(.045,12,8),0,0,.25);
   }
-  parent.add(item);
 }

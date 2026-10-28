@@ -253,6 +253,17 @@ export function App() {
             <p>Use WASD, arrow keys, or the controls below. Open another tab to add a second character.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />
+            <label className="cosmetic-picker">
+              <span>Your accessory</span>
+              <select value={cosmetic} onChange={event => {
+                const next=event.target.value as CosmeticId;
+                setCosmetic(next);
+                if(joinedProfile.current) joinedProfile.current.cosmetic=next;
+                socket.emit('changeCosmetic',next);
+              }}>
+                {COSMETICS.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
             <div className="obs-note">
               <span>OBS BROWSER SOURCE</span>
               <code>http://localhost:5173/?view=overlay</code>

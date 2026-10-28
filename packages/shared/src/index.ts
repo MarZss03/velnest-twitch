@@ -50,5 +50,6 @@ export type ClientToServerEvents = {
   joinRoom: (payload: JoinPayload) => void;
   move: (payload: MovePayload) => void;
   performAction: (actionId: ActionId) => void;
+  changeCosmetic: (cosmetic: CosmeticId) => void;
 };
 

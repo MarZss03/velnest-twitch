@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { Participant } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
 
-type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[]; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement };
+type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[]; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
 
 export function Room3D({ participants }: { participants: Participant[] }) {
   const host = useRef<HTMLDivElement>(null);
@@ -89,11 +89,12 @@ export function Room3D({ participants }: { participants: Participant[] }) {
             gltf.scene.position.set((p.x-50)/12,0,(p.y-50)/16);
             scene.add(gltf.scene);
             attachCosmetic(gltf.scene,p.cosmetic);
-            actors.set(p.id,{model:gltf.scene,mixer:new THREE.AnimationMixer(gltf.scene),clips:gltf.animations,target:new THREE.Vector3(),action:'',nonce:-1,label});
+            actors.set(p.id,{model:gltf.scene,mixer:new THREE.AnimationMixer(gltf.scene),clips:gltf.animations,target:new THREE.Vector3(),action:'',nonce:-1,label,cosmetic:p.cosmetic});
           },undefined,()=>{ pending.delete(p.id); failed.add(p.id); setError('A character could not load. Reload the room to retry.'); });
         }
         actor = actors.get(p.id);
         if (!actor) continue;
+        if(actor.cosmetic!==p.cosmetic) { attachCosmetic(actor.model,p.cosmetic); actor.cosmetic=p.cosmetic; }
         actor.target.set((p.x-50)/12,0,(p.y-50)/16);
         const delta=actor.target.clone().sub(actor.model.position);
         const walking=delta.lengthSq()>.0004;
