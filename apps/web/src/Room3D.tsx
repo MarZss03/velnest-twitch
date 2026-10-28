@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { AVATARS, canOccupy, floorHeight, fromWorld, type Participant } from '@velnest/shared';
+import { AVATARS, SEATS, canOccupy, floorHeight, fromWorld, type Participant, type SeatId } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
 import { createAnimator } from './animation';
 import { dispose3D } from './dispose3D';
 import { createRoomMotion } from './roomMotion';
 
-type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
+type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; cosmetic: string };
 
-export function Room3D({ participants, onNavigate, selfId }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void; selfId?: string }) {
+export function Room3D({ participants, onNavigate, onSit, selfId }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const people = useRef(participants);
   people.current = participants;
   const navigate=useRef(onNavigate);
   navigate.current=onNavigate;
+  const sit=useRef(onSit);
+  sit.current=onSit;
   const self=useRef(selfId);
   self.current=selfId;
   const [error, setError] = useState('');
@@ -48,10 +50,19 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
     const raycaster=new THREE.Raycaster();
     const ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
     const point=new THREE.Vector3();
+    const seatTargets=SEATS.map(seat=>{
+      const target=new THREE.Mesh(new THREE.BoxGeometry(.58,.24,.66),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+      target.position.set(seat.x,.59,seat.z);
+      target.userData.seatId=seat.id;
+      scene.add(target);
+      return target;
+    });
     const onClick=(event:MouseEvent)=>{
       if(!navigate.current) return;
       const rect=renderer.domElement.getBoundingClientRect();
       raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1),camera);
+      const cushion=raycaster.intersectObjects(seatTargets)[0];
+      if(cushion && sit.current) { sit.current(cushion.object.userData.seatId); return; }
       if(raycaster.ray.intersectPlane(ground,point)) {
         const destination=fromWorld(point.x,point.z);
         if(!canOccupy(destination.x,destination.y)) return;
@@ -118,6 +129,7 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
         camera.lookAt(0,0,0);
       }
       actors.forEach((actor,id) => { if (!ids.has(id)) { scene.remove(actor.model); actor.mixer.stopAllAction(); disposeModel(actor.model); actor.label.remove(); actors.delete(id); } });
+      const placedLabels: {x:number;y:number;width:number}[]=[];
       for (const p of people.current) {
         let actor = actors.get(p.id);
         if (!actor && !pending.has(p.id) && !failed.has(p.id)) {
@@ -137,7 +149,7 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
             motion.emit('arrival',gltf.scene.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
             attachCosmetic(gltf.scene,p.cosmetic);
             const mixer=new THREE.AnimationMixer(gltf.scene);
-            actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,cosmetic:p.cosmetic});
+            actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,labelWidth:0,cosmetic:p.cosmetic});
           },undefined,()=>{ pending.delete(p.id); failed.add(p.id); setError('A character could not load. Reload the room to retry.'); });
         }
         actor = actors.get(p.id);
@@ -147,19 +159,31 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
         actor.target.y=floorHeight(actor.target.x,actor.target.z);
         const delta=actor.target.clone().sub(actor.model.position);
         const walking=delta.lengthSq()>.0004;
-        if(walking) actor.model.rotation.y=Math.atan2(delta.x,delta.z);
+        if(p.seat?.status==='seated') actor.model.rotation.y=0;
+        else if(walking) actor.model.rotation.y=Math.atan2(delta.x,delta.z);
         actor.model.position.lerp(actor.target,reduced.matches?1:1-Math.exp(-dt*14));
-        const action=p.action??(walking?'walk':'idle');
+        const action=p.seat?.status==='seated'?'sit':p.action??(walking?'walk':'idle');
         if(actor.action!==action || actor.nonce!==p.actionNonce) {
           if(p.action && actor.nonce!==p.actionNonce) motion.emit(p.action,actor.model.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
           actor.action=action; actor.nonce=p.actionNonce;
           actor.label.dataset.action=p.action??'';
-          actor.label.textContent=p.action ? `${p.displayName} · ${p.action}` : p.displayName;
+          actor.label.textContent=p.seat?.status==='seated' ? `${p.displayName} · seated` : p.action ? `${p.displayName} · ${p.action}` : p.displayName;
+          actor.labelWidth=actor.label.offsetWidth;
           actor.animate(action,reduced.matches);
         }
         if(!reduced.matches) actor.mixer.update(dt);
         const screen=actor.model.position.clone().add(new THREE.Vector3(0,1.2,0)).project(camera);
-        actor.label.style.transform=`translate(-50%,-100%) translate(${(screen.x*.5+.5)*el.clientWidth}px,${(-screen.y*.5+.5)*el.clientHeight}px)`;
+        const x=(screen.x*.5+.5)*el.clientWidth;
+        const anchorY=(-screen.y*.5+.5)*el.clientHeight;
+        let y=anchorY;
+        for(let attempt=0;attempt<people.current.length;attempt++) {
+          const overlap=placedLabels.find(label=>Math.abs(x-label.x)<(actor.labelWidth+label.width)/2+6 && Math.abs(y-label.y)<26);
+          if(!overlap) break;
+          y=overlap.y-28;
+        }
+        placedLabels.push({x,y,width:actor.labelWidth});
+        actor.label.style.setProperty('--leader-height',`${anchorY-y}px`);
+        actor.label.style.transform=`translate(-50%,-100%) translate(${x}px,${y}px)`;
       }
       motion.update(dt,reduced.matches);
       renderer.render(scene,camera);

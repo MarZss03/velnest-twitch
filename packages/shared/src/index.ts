@@ -1,4 +1,7 @@
 export { toWorld, fromWorld, canOccupy, moveInRoom, floorHeight, clearSegment, findRoomPath } from './room.js';
+export { SEATS } from './seats.js';
+export type { SeatId } from './seats.js';
+import type { SeatId } from './seats.js';
 
 export const AVATARS = [
   { id: "riff", name: "Riff", image: "/avatars/identity-lineup.png", position: "0% 50%", color: "#b59cff", accent: "#3b2a64" },
@@ -31,6 +34,7 @@ export type Participant = {
   action: ActionId | null;
   actionNonce: number;
   cosmetic: CosmeticId;
+  seat: { id: SeatId; status: 'approaching' | 'seated' } | null;
 };
 
 export type JoinPayload = {
@@ -45,6 +49,7 @@ export type MovePayload = {
 };
 
 export type ServerToClientEvents = {
+  interactionError: (message: string) => void;
   roomError: (error: { code: 'sign_in_required' | 'subscription_required'; message: string }) => void;
   roomState: (participants: Participant[]) => void;
 };
@@ -56,6 +61,8 @@ export type SessionInfo = {
 export type RoomConfig = { mockMode: boolean; oauthConfigured: boolean; room: string };
 
 export type ClientToServerEvents = {
+  sit: (seatId: SeatId) => void;
+  stand: () => void;
   joinRoom: (payload: JoinPayload) => void;
   move: (payload: MovePayload) => void;
   performAction: (actionId: ActionId) => void;

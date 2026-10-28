@@ -6,6 +6,7 @@ import {
   AVATARS,
   ACTIONS,
   COSMETICS,
+  SEATS,
   canOccupy,
   moveInRoom,
   findRoomPath,
@@ -46,6 +47,11 @@ function cleanDisplayName(value: string) {
 io.on("connection", (socket) => {
   let lastMove=0, lastAction=0, lastJoin=0;
   let route: {x:number;y:number}[]=[];
+  const releaseSeat=(participant:Participant)=>{
+    const seat=SEATS.find(seat=>seat.id===participant.seat?.id);
+    if(seat && participant.seat?.status==='seated') Object.assign(participant,seat.approach);
+    participant.seat=null;
+  };
   const denyAccess = () => {
     const user=auth.sessionForCookie(socket.request.headers.cookie)?.user;
     if(config.mockMode || (user && user.role !== 'viewer')) return false;
@@ -66,10 +72,24 @@ io.on("connection", (socket) => {
     if(!participant || !destination) return;
     const dx=destination.x-participant.x, dy=destination.y-participant.y;
     const length=Math.hypot(dx,dy);
-    if(length<.15) { route.shift(); return; }
+    if(length<.15) {
+      route.shift();
+      if(!route.length && participant.seat?.status==='approaching') {
+        const seat=SEATS.find(seat=>seat.id===participant.seat?.id)!;
+        Object.assign(participant,seat.position);
+        participant.seat.status='seated';
+        participant.action=null;
+        emitRoomState();
+      }
+      return;
+    }
     const step=Math.min(length,2.25);
     const next=moveInRoom(participant.x,participant.y,dx/length*step,dy/length*step);
-    if(next.x===participant.x && next.y===participant.y) { route=[]; return; }
+    if(next.x===participant.x && next.y===participant.y) {
+      route=[]; releaseSeat(participant); emitRoomState();
+      socket.emit('interactionError','That seat could not be reached. Choose another spot.');
+      return;
+    }
     participant.x=next.x; participant.y=next.y;
     emitRoomState();
   },70);
@@ -77,7 +97,33 @@ io.on("connection", (socket) => {
     if(!position || typeof position.x!=='number' || typeof position.y!=='number' || !canOccupy(position.x,position.y)) return;
     const participant=participants.get(socket.id);
     if(!participant) return;
+    releaseSeat(participant);
     route=findRoomPath(participant,position);
+    emitRoomState();
+  });
+  socket.on('sit',seatId=>{
+    const participant=participants.get(socket.id);
+    const seat=SEATS.find(seat=>seat.id===seatId);
+    if(!participant || !seat || participant.seat?.id===seatId) return;
+    if([...participants.values()].some(person=>person.seat?.id===seatId)) {
+      socket.emit('interactionError','Someone already has that seat. Try another cushion.');
+      return;
+    }
+    const previous=SEATS.find(seat=>seat.id===participant.seat?.id);
+    const start=participant.seat?.status==='seated' && previous ? previous.approach : participant;
+    const path=findRoomPath(start,seat.approach);
+    if(!path.length) { socket.emit('interactionError','That seat could not be reached. Choose another spot.'); return; }
+    releaseSeat(participant);
+    participant.seat={id:seat.id,status:'approaching'};
+    participant.action=null;
+    participant.actionNonce=Date.now();
+    route=path;
+    emitRoomState();
+  });
+  socket.on('stand',()=>{
+    const participant=participants.get(socket.id);
+    if(!participant?.seat) return;
+    route=[]; releaseSeat(participant); emitRoomState();
   });
   // Late-joining viewers—especially OBS Browser Sources—need the current
   // snapshot immediately instead of waiting for the next player event.
@@ -88,6 +134,7 @@ io.on("connection", (socket) => {
     const now=Date.now();
     if(now-lastJoin<300) return;
     lastJoin=now;
+    route=[];
     const {displayName,avatarId,cosmetic}=payload;
 
     let x=20 + Math.round(Math.random()*60);
@@ -101,7 +148,8 @@ io.on("connection", (socket) => {
       y,
       action: null,
       actionNonce: 0,
-      cosmetic: COSMETICS.some(item => item.id === cosmetic) ? cosmetic! : 'none'
+      cosmetic: COSMETICS.some(item => item.id === cosmetic) ? cosmetic! : 'none',
+      seat: null
     });
     emitRoomState();
   });
@@ -112,9 +160,11 @@ io.on("connection", (socket) => {
     if(now-lastMove<40) return;
     lastMove=now;
     const {dx,dy}=payload;
+    if(dx===0 && dy===0) return;
     route=[];
     const participant = participants.get(socket.id);
     if (!participant) return;
+    releaseSeat(participant);
 
     const safeDx = Math.max(-1, Math.min(1, Number(dx) || 0));
     const safeDy = Math.max(-1, Math.min(1, Number(dy) || 0));
@@ -128,6 +178,7 @@ io.on("connection", (socket) => {
   socket.on("performAction", (actionId) => {
     const participant = participants.get(socket.id);
     if (!participant || !allowedActionIds.has(actionId)) return;
+    if(participant.seat) { socket.emit('interactionError','Stand up to react.'); return; }
     const now=Date.now();
     if(now-lastAction<250) return;
     lastAction=now;

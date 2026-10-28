@@ -11,6 +11,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - keyboard and touch controls;
 - a clean OBS overlay view;
 - event-driven 3D arrival, destination and reaction effects;
+- three reservable sofa seats with walk-to-seat, Blender-authored sitting and standing transitions;
 - server-side Twitch OAuth, subscriber verification and expiring sessions.
 
 Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). Until credentials are configured and a live account walkthrough succeeds, the Twitch integration is not considered verified against Twitch itself.
@@ -40,6 +41,7 @@ pnpm test:auth
 pnpm test:room
 pnpm test:animations
 pnpm test:motion
+pnpm test:seating
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.

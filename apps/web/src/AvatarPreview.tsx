@@ -77,6 +77,6 @@ export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: Avata
   return <section className="character-preview" aria-label={`${avatarId} 3D preview`}>
     <div ref={host} className="character-canvas" />
     <p role="status">{status}</p>
-    <div className="preview-actions">{['Idle', 'Walk', 'Wave', 'Cheer', 'Dance'].map(name => <button key={name} type="button" onClick={() => play.current(name)}>{name}</button>)}</div>
+    <div className="preview-actions">{['Idle', 'Walk', 'Wave', 'Cheer', 'Dance', 'Sit'].map(name => <button key={name} type="button" onClick={() => play.current(name)}>{name}</button>)}</div>
   </section>;
 }

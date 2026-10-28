@@ -103,7 +103,8 @@ for identity in ['riff','arc','muse']:
     for name, pos, parent in [('slot_head',(0,0,.25),head),('slot_face',(0,-.20,0),head),('slot_back',(0,.13,.04),body),('slot_chest',(0,-.14,.05),body)]: joint(name,pos,parent)
     bpy.context.scene.render.fps=30
     animated = [root,body,*arms,*legs]
-    for clip in ['Idle','Walk','Wave','Cheer','Dance']:
+    clips = ['Idle','Walk','Wave','Cheer','Dance','Sit']
+    for clip in clips:
         for obj in animated:
             if obj.animation_data:
                 obj.animation_data.action = None
@@ -120,6 +121,15 @@ for identity in ['riff','arc','muse']:
                 arms[0].rotation_euler.x=math.sin(t*2)*.28
                 arms[1].rotation_euler.x=-math.sin(t*2)*.28
                 root.location.z=abs(math.sin(t*2))*.025
+            if clip=='Sit':
+                # The seat cushion top is .52m. The jacket hem rests there while
+                # the simple rigid legs extend forward in the shared toy style.
+                root.location.z=.15
+                body.rotation_euler.y=math.sin(t)*.012
+                for leg in legs: leg.rotation_euler.x=-math.pi/2
+                for arm in arms:
+                    arm.rotation_euler.x=-.55
+                    arm.rotation_euler.y=0
             for obj in animated:
                 obj.keyframe_insert(data_path='location',frame=frame)
                 obj.keyframe_insert(data_path='rotation_euler',frame=frame)
@@ -162,7 +172,7 @@ for identity in ['riff','arc','muse']:
         group.add(list(range(len(obj.data.vertices))),1.0,'REPLACE')
         modifier=obj.modifiers.new('Shared humanoid skin','ARMATURE')
         modifier.object=rig
-    for clip in ['Idle','Walk','Wave','Cheer','Dance']:
+    for clip in clips:
         for control in animated:
             for track in control.animation_data.nla_tracks:track.mute=track.name!=clip
         rig.animation_data_create()

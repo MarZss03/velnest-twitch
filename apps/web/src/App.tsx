@@ -6,6 +6,8 @@ import {
   AVATARS,
   ACTIONS,
   COSMETICS,
+  SEATS,
+  type SeatId,
   type CosmeticId,
   type ActionId,
   type AvatarId,
@@ -27,16 +29,20 @@ const authMessages: Record<string,string> = {
   invalid_state: 'That sign-in link expired. Please start again.',
   unavailable: 'Twitch sign-in could not finish. Please try again.',
 };
+const showWorld=()=>{
+  window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  document.getElementById('community-world')?.focus({preventScroll:true});
+};
 
-function World({ participants, connected, onNavigate, selfId }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void; selfId?: string }) {
+function World({ participants, connected, onNavigate, onSit, selfId }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
   return (
-    <section className="world-shell" aria-label="VELNEST shared world">
+    <section id="community-world" className="world-shell" tabIndex={-1} aria-label="VELNEST shared world">
       <div className="world-topline">
         {connected ? "Connected to the nest" : "Reconnecting…"}
         <span>{participants.length} inside</span>
       </div>
       <div className="world">
-        <Room3D participants={participants} onNavigate={onNavigate} selfId={selfId} />
+        <Room3D participants={participants} onNavigate={onNavigate} onSit={onSit} selfId={selfId} />
         {participants.length === 0 && (
           <div className="empty-world">
             <span>Your community goes here.</span>
@@ -86,11 +92,11 @@ function Dpad({ onMove }: { onMove: (direction: Direction) => void }) {
   );
 }
 
-function ActionBar({ onAction, active }: { onAction: (actionId: ActionId) => void; active: ActionId | null }) {
+function ActionBar({ onAction, active, disabled=false }: { onAction: (actionId: ActionId) => void; active: ActionId | null; disabled?:boolean }) {
   return (
     <div className="action-bar" aria-label="Character actions">
       {ACTIONS.map((action) => (
-        <button key={action.id} aria-pressed={active===action.id} onClick={() => onAction(action.id)} type="button">
+        <button key={action.id} disabled={disabled} aria-pressed={active===action.id} onClick={() => onAction(action.id)} type="button">
           {action.name}
         </button>
       ))}
@@ -112,6 +118,7 @@ export function App() {
   const [accountAttempt,setAccountAttempt]=useState(0);
   const [accountLoading,setAccountLoading]=useState(true);
   const [accountError,setAccountError]=useState('');
+  const [interactionMessage,setInteractionMessage]=useState('');
   const [roomError,setRoomError]=useState(()=>authMessages[new URLSearchParams(location.search).get('auth')??'']??'');
   const joinedProfile = useRef<{ displayName: string; avatarId: AvatarId; cosmetic: CosmeticId } | null>(null);
 
@@ -119,6 +126,12 @@ export function App() {
     const url=new URL(location.href);
     if(url.searchParams.has('auth')) { url.searchParams.delete('auth'); history.replaceState(null,'',url); }
   },[]);
+
+  useEffect(()=>{
+    if(isOverlay) return;
+    window.scrollTo({top:0,behavior:'instant'});
+    if(joined) document.getElementById('community-world')?.focus({preventScroll:true});
+  },[joined]);
 
   useEffect(()=>{
     const controller=new AbortController();
@@ -156,11 +169,13 @@ export function App() {
     socket.on("disconnect", onDisconnect);
     socket.on("roomState", onRoomState);
     socket.on('roomError',onRoomError);
+    socket.on('interactionError',setInteractionMessage);
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("roomState", onRoomState);
       socket.off('roomError',onRoomError);
+      socket.off('interactionError',setInteractionMessage);
       socket.disconnect();
     };
   }, [socket]);
@@ -205,6 +220,8 @@ export function App() {
     socket.emit("joinRoom", joinedProfile.current);
     setJoined(true);
   };
+  const selfParticipant=participants.find(person=>person.id===socket.id);
+  const requestSeat=(seatId:SeatId)=>{ setInteractionMessage(''); socket.emit('sit',seatId); showWorld(); };
 
   const signOut=async()=>{
     setAccountLoading(true);
@@ -287,7 +304,7 @@ export function App() {
         </section>
       ) : (
         <section className="play-layout">
-          <World participants={participants} connected={connected} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} />
+          <World participants={participants} connected={connected} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} onSit={requestSeat} />
           <aside className="controller">
             <h2>Hey, {displayName}.</h2>
             <button className="leave-room" type="button" onClick={()=>{
@@ -297,7 +314,19 @@ export function App() {
             }}>Leave and change character</button>
             <p>Click the floor to walk around furniture. Use WASD, arrow keys, or hold the controls below to take over.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
-            <ActionBar active={participants.find(p=>p.id===socket.id)?.action??null} onAction={(actionId) => socket.emit("performAction", actionId)} />
+            <ActionBar disabled={Boolean(selfParticipant?.seat)} active={selfParticipant?.action??null} onAction={(actionId) => socket.emit("performAction", actionId)} />
+            <div className="seat-controls" aria-label="Sofa seats">
+              <span className="seat-heading">Take a seat</span>
+              <div className="seat-options">{SEATS.map((seat,index)=>{
+                const occupant=participants.find(person=>person.seat?.id===seat.id);
+                const mine=occupant?.id===socket.id;
+                return <button type="button" key={seat.id} disabled={Boolean(occupant)} aria-label={`Sit on ${seat.name}${occupant ? `, ${mine?'your seat':`taken by ${occupant.displayName}`}` : ''}`} onClick={()=>requestSeat(seat.id)}>
+                  {['Left','Middle','Right'][index]}<small>{mine?'Yours':occupant?'Taken':'Available'}</small>
+                </button>;
+              })}</div>
+              {selfParticipant?.seat ? <button className="stand-button" type="button" onClick={()=>{setInteractionMessage('');socket.emit('stand');showWorld();}}>{selfParticipant.seat.status==='seated'?'Stand up':'Cancel walk to seat'}</button> : <p>Click a cushion or choose a seat above.</p>}
+              <p className="seat-status" role="status">{interactionMessage || (selfParticipant?.seat?.status==='approaching'?'Walking to your seat…':selfParticipant?.seat?.status==='seated'?'Make yourself at home. Stand up to react.':'')}</p>
+            </div>
             <label className="cosmetic-picker">
               <span>Your accessory</span>
               <select value={cosmetic} onChange={event => {

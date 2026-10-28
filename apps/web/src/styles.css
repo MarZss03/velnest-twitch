@@ -65,23 +65,38 @@ input,select { width: 100%; border: 1px solid var(--room-line); border-radius: 8
 canvas { display: block; }
 .character-preview p { color: var(--room-muted); font-size: 12px; text-align: center; }
 .preview-actions,.action-bar { display: flex; gap: 6px; margin-bottom: 20px; }
+.preview-actions { flex-wrap: wrap; }
 .preview-actions button,.action-bar button { flex: 1; min-height: 44px; padding: 6px; border: 1px solid var(--room-line); border-radius: 6px; background: var(--room-panel); font-size: 12px; }
 .preview-actions button:hover,.action-bar button:hover { border-color: var(--room-accent); }
 .action-bar button { position: relative; overflow: hidden; transition: background-color 140ms, border-color 140ms, color 140ms; }
 .action-bar button[aria-pressed="true"] { background: var(--room-accent); color: var(--room-ground); border-color: var(--room-accent); }
 .action-bar button:active,.enter-button:active { transform: scale(.97); }
+.action-bar button:disabled { opacity: .45; cursor: not-allowed; }
+.seat-controls { border-top: 1px solid var(--room-line); padding-top: 16px; }
+.seat-heading { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+.seat-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+.seat-options button,.stand-button { min-height: 44px; padding: 8px 4px; border: 1px solid var(--room-line); border-radius: 6px; background: var(--room-panel); font-size: 12px; }
+.seat-options button:hover:not(:disabled),.stand-button:hover { border-color: var(--room-accent); }
+.seat-options button:disabled { color: var(--room-muted); cursor: not-allowed; }
+.seat-options small { display: block; margin-top: 4px; font-size: 10px; color: var(--room-muted); }
+.stand-button { width: 100%; margin-top: 8px; color: var(--room-accent); }
+.seat-controls p { font-size: 12px; margin: 8px 0; }
+.seat-status:empty { display: none; }
 .world-shell { min-width: 0; display: flex; flex-direction: column; }
+.world-shell:focus-visible { outline: 2px solid var(--room-accent); outline-offset: 4px; }
 .world-topline { display: flex; align-items: center; justify-content: space-between; height: 40px; color: var(--room-muted); font-size: 12px; }
 .world { position: relative; flex: 1; min-height: 520px; border-radius: 12px; overflow: clip; background: var(--room-floor); isolation: isolate; }
 .intro .world { min-height: 480px; }
 .room-3d { position: absolute; inset: 0; }
 .room-3d canvas { width: 100%; height: 100%; }
 .room-nameplate { position: absolute; left: 0; top: 0; padding: 4px 8px; border-radius: 6px; background: var(--room-ground); color: var(--room-ink); font-size: 11px; pointer-events: none; white-space: nowrap; }
+.room-nameplate::after { content: ''; position: absolute; top: 100%; left: 50%; width: 1px; height: var(--leader-height,0px); background: var(--room-accent); opacity: .55; }
 .room-nameplate[data-action]:not([data-action=""]) { color: var(--room-accent); }
 .room-error { position: absolute; z-index: 2; padding: 12px; background: var(--room-ground); color: var(--room-ink); }
 .empty-world { position: absolute; left: 5%; bottom: 24px; width: 90%; text-align: center; pointer-events: none; color: var(--room-muted); font-size: 13px; }
 .empty-world span { display: block; margin-bottom: 8px; color: var(--room-ink); font-weight: 700; }
-.play-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; align-items: stretch; gap: 20px; padding-top: 20px; min-height: calc(100vh - 108px); }
+.play-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; align-items: start; gap: 20px; padding-top: 20px; min-height: calc(100vh - 108px); }
+.play-layout .world-shell { position: sticky; top: 20px; height: calc(100dvh - 116px); min-height: 560px; }
 .controller { border: 1px solid var(--room-line); border-radius: 12px; padding: 24px; }
 .play-layout .controller { animation: controller-open 420ms var(--motion-arrive); }
 @keyframes controller-open { from { clip-path: inset(0 0 100% 0 round 12px); } to { clip-path: inset(0 0 0 0 round 12px); } }
@@ -104,5 +119,5 @@ canvas { display: block; }
 .overlay .world-topline { display: none; }
 .overlay .world { border-radius: 0; min-height: 100vh; }
 @media (max-width: 1000px) { .app-shell { padding: 0 20px 24px; } .join-layout { grid-template-columns: minmax(0,1fr) 290px; gap: 20px; } }
-@media (max-width: 760px) { .join-layout { grid-template-columns: minmax(0,1fr); padding-top: 24px; } .intro .world { min-height: 320px; } .join-card { padding: 24px 0 0; border: 0; } .brand { font-size: 15px; } .play-layout { grid-template-columns: minmax(0,1fr); } .world { min-height: 50vh; } }
+@media (max-width: 760px) { .join-layout { grid-template-columns: minmax(0,1fr); padding-top: 24px; } .intro .world { min-height: 320px; } .join-card { padding: 24px 0 0; border: 0; } .brand { font-size: 15px; } .play-layout { grid-template-columns: minmax(0,1fr); } .play-layout .world-shell { position: static; height: auto; min-height: 0; } .world { min-height: 50vh; } }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

@@ -2,6 +2,7 @@ import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {createAnimator} from '../src/animation.ts';
 
 for(const identity of ['riff','arc','muse']) {
   const bytes=await readFile(new URL(`../public/models/${identity}.glb`,import.meta.url));
@@ -47,8 +48,27 @@ for(const identity of ['riff','arc','muse']) {
   const walkA=sample('Walk',.15),walkB=sample('Walk',.65);
   assert.ok(walkA.Leg_L.q.angleTo(walkB.Leg_L.q)>.2,'Walk legs must stride');
   assert.ok(sample('Dance',.3).Arm_L.q.angleTo(idle.Arm_L.q)>.05,'Dance must move arms');
+  const seated=sample('Sit',.5);
+  assert.ok(seated.Leg_L.q.angleTo(idle.Leg_L.q)>1.4,'Sit must rotate left leg forward');
+  assert.ok(seated.Leg_R.q.angleTo(idle.Leg_R.q)>1.4,'Sit must rotate right leg forward');
+  assert.ok(Math.abs(seated.Root.p.y-.15)<.001,'Sit root must match the authored cushion height');
+  const shoe=skinned.find(mesh=>mesh.name==='Shoe_L');
+  assert.ok(shoe,'Seated shoe must remain skinned');
+  const shoeVertex=new THREE.Vector3();
+  shoe.getVertexPosition(0,shoeVertex).applyMatrix4(shoe.matrixWorld);
+  const hip=gltf.scene.getObjectByName('Leg_L').getWorldPosition(new THREE.Vector3());
+  assert.ok(shoeVertex.z>hip.z+.12,'Seated skin must move the actual shoe forward');
+  assert.ok(shoeVertex.y>.35,'Seated skin must lift the actual shoe above the floor');
+  const animate=createAnimator(mixer,gltf.animations);
+  animate('Sit',true);
+  const held=gltf.scene.getObjectByName('Leg_L').quaternion.clone();
+  mixer.update(.6);
+  assert.ok(held.angleTo(gltf.scene.getObjectByName('Leg_L').quaternion)<.001,'Reduced motion must hold the seated pose');
+  assert.ok(held.angleTo(idle.Leg_L.q)>1.4,'Reduced motion must preserve sitting state');
+  animate('Idle',false); mixer.update(.4);
+  assert.ok(gltf.scene.getObjectByName('Leg_L').quaternion.angleTo(idle.Leg_L.q)<.001,'Restoring motion must release the held seated pose');
   const restored=sample('Idle',.5);
   assert.ok(restored.Arm_L.q.angleTo(idle.Arm_L.q)<.001,'Idle must restore the left arm');
   assert.ok(restored.Root.p.distanceTo(idle.Root.p)<.001,'Idle must restore root height');
-  console.log(`PASS ${identity}: five clips, raised arms, jump, wave, stride, dance and idle restoration`);
+  console.log(`PASS ${identity}: six clips, raised arms, jump, wave, stride, dance, seated/reduced pose and idle restoration`);
 }

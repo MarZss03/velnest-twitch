@@ -70,3 +70,11 @@ Verified: typecheck, production build, existing three-character animation checks
 ## Twitch identity boundary — October 28
 
 Implemented OAuth, cookie sessions, subscriber/broadcaster authorization and session revocation checks, with explicit demo mode retained. Ten automated route/realtime tests pass against a simulated Twitch provider. Browser checks confirm demo entry, cancelled-login messaging and disabled entry when real-mode credentials are missing. Compiled-server startup is also verified; shared-package exports now resolve compiled JavaScript. Live Twitch authorization and contest submission remain unverified. See TWITCH-SETUP.md.
+
+## Shared sofa interaction — October 28
+
+All three Blender sources and GLBs now contain an authored Sit clip in addition to Idle, Walk, Wave, Cheer and Dance. Rig tests sample the actual skinned shoe to verify it moves forward and above the floor, check root/cushion height, preserve a stationary seated pose under reduced motion, and restore standing animation correctly.
+
+The server owns three seat reservations and collision-free approach routes. Racing claims admit one owner. Moving or standing releases a reservation; disconnect/leave/authorization loss removes it with the participant. A late OBS connection receives the current seated snapshot. Seat buttons show available/taken/yours states, and the cushion itself can be clicked. Reduced motion retains the seated pose. Nameplates avoid one another, and the desktop scene height stays independent of the control rail.
+
+Verification: three seating integration tests, six-clip checks for each avatar, existing authentication/pathfinding/motion checks, typecheck and build. Browser walkthrough shows all three identities sitting together with accessories in an OBS view. A 390px mobile walkthrough checks entry focus, automatic scene return on seat selection and no horizontal overflow. Live Twitch authorization and the remaining design-skill final reviews still need completion.
