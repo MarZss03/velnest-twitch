@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "frames": 360,
+  "duration": 12,
+  "codec": "h264",
+  "pixelFormat": "yuv420p",
+  "audioStreams": 0,
+  "bytes": 6188227,
+  "decodedSamples": 12,
+  "uniqueSampleFrames": 12
+}

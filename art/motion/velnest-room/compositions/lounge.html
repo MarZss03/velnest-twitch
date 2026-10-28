@@ -1,0 +1,35 @@
+<template>
+ <style>
+  @font-face{font-family:Manrope;font-weight:800;font-style:normal;src:url('assets/fonts/manrope-800.ttf') format('truetype');}
+  #root{position:absolute;inset:0;color:var(--ink);font-family:Manrope,sans-serif;}
+  #lounge-canvas{position:absolute;left:0;top:0;width:1920px;height:810px;}
+  .type-layer{position:absolute;inset:0;pointer-events:none;}
+  .line{position:absolute;left:144px;top:856px;max-width:1632px;font-size:96px;font-weight:800;line-height:1.06;letter-spacing:-.035em;}
+  #lounge-payoff-text{top:864px;font-size:82px;}
+  #lounge-brand-text{top:838px;font-size:112px;color:var(--accent);}
+ </style>
+ <div data-hf-id="hf-2woh" id="root" data-composition-id="lounge" data-width="1920" data-height="1080">
+  <canvas data-hf-id="hf-0asv" id="lounge-canvas" width="1920" height="810" data-layout-allow-overflow aria-label="Three VELNEST characters in the shared lounge"></canvas>
+  <div data-hf-id="hf-d8iu" id="lounge-hook" class="clip type-layer" data-start="0" data-duration="3.1" data-track-index="1" data-beat="wave"><h1 data-hf-id="hf-e4sc" id="lounge-hook-text" class="line" data-var-text="headline">Your seat’s waiting</h1></div>
+  <div data-hf-id="hf-oj6f" id="lounge-payoff" class="clip type-layer" data-start="7.6" data-duration="2" data-track-index="2" data-beat="sit"><p data-hf-id="hf-gt4e" id="lounge-payoff-text" class="line" data-var-text="payoff">Make yourself at home</p></div>
+  <div data-hf-id="hf-mgjn" id="lounge-brand" class="clip type-layer" data-start="9.6" data-duration="2.4" data-track-index="3" data-beat="reveal"><p data-hf-id="hf-o9q4" id="lounge-brand-text" class="line" data-var-text="brand">velnest</p></div>
+ </div>
+ <script>
+  window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+  const filmReady=VelnestFilm.build(document.getElementById('lounge-canvas'));
+  window.__hf.buildReady.lounge=filmReady.then(film=>film.renderAt(window.__hfThreeTime||0));
+  // Register in the composition so HyperFrames scopes and cleans up the listener
+  // on live edits. Holding the seek also keeps GPU paint in step with text.
+  window.addEventListener('hf-seek',event=>{
+    const rendered=filmReady.then(film=>film.renderAt(event.detail.time));
+    event.detail.waitUntil?.(rendered);
+  });
+  const tl=gsap.timeline({paused:true});
+  tl.fromTo('#lounge-hook-text',{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)',duration:.3,ease:'power3.out'},0);
+  tl.fromTo('#lounge-hook-text',{opacity:1},{opacity:0,duration:.18},2.9);
+  tl.fromTo('#lounge-payoff-text',{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)',duration:.25,ease:'power3.out'},7.6);
+  tl.fromTo('#lounge-brand-text',{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)',duration:.35,ease:'power3.out'},9.6);
+  tl.to({}, {duration:.01},11.98);
+  window.__timelines=window.__timelines||{};window.__timelines.lounge=tl;
+ </script>
+</template>

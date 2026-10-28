@@ -23,6 +23,6 @@ The three sofa cushions are interactive targets with an equivalent keyboard-acce
 
 ## Skill application and limits
 
-Impeccable informed artifact-led hierarchy, browser inspection and corrective passes. Hallmark informed explicit tokens, visible focus, restrained copy and reduced-motion fallbacks. Taste informed replacing the generic marketing splash with the product in use. UI UX Pro Max supplied gaming/3D direction and accessible control guidance. HyperFrames is installed and its 3D guidance was consulted; no HyperFrames video has been produced yet. These are working methods and local instructions, not model training.
+Impeccable informed artifact-led hierarchy, browser inspection and corrective passes. Hallmark informed explicit tokens, visible focus, restrained copy and reduced-motion fallbacks. Taste informed replacing the generic marketing splash with the product in use. UI UX Pro Max supplied gaming/3D direction and accessible control guidance. HyperFrames now supplies an editable 12-second 1080p motion study using the actual Blender GLBs, character clips and shared pathfinding, with deterministic seeking and a verified local MP4. These are working methods and local instructions, not model training.
 
-Outstanding: finish all viewport and cosmetic/animation combinations, stabilize font loading, complete the skills' final review gates, and create the requested motion presentation where it serves the product.
+Outstanding: finish all viewport and cosmetic/animation combinations, stabilize website font loading, complete the frontend skills' final review gates, and capture the real Twitch operation needed for the contest demonstration.

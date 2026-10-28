@@ -1,0 +1,11 @@
+import {cp,mkdir} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {dirname,resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const here=dirname(fileURLToPath(import.meta.url));
+const root=resolve(here,'../../..');
+await mkdir(resolve(here,'assets/models'),{recursive:true});
+for(const model of ['riff','arc','muse','afterparty']) await cp(resolve(root,`apps/web/public/models/${model}.glb`),resolve(here,`assets/models/${model}.glb`));
+const require=createRequire(resolve(root,'apps/web/package.json'));
+const {build}=await import(pathToFileURL(require.resolve('vite')));
+await build({configFile:resolve(here,'vite.config.mjs')});

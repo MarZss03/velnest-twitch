@@ -1,0 +1,6 @@
+GSAP 3.14.2
+Copyright 2025, GreenSock. All rights reserved.
+
+The original @license notice is retained in gsap.min.js.
+Official terms: https://gsap.com/standard-license
+Pinned source: https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js

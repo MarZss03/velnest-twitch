@@ -32,6 +32,8 @@ http://localhost:5173/?view=overlay
 
 The realtime server runs at `http://localhost:3001`.
 
+An editable 12-second Blender/HyperFrames motion study and its verified 1080p MP4 are in [art/motion/velnest-room](art/motion/velnest-room/README.md). This staged character sequence is separate from the required live Twitch contest demonstration.
+
 ## Verify
 
 ```powershell

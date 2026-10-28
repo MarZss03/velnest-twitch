@@ -1,0 +1,12 @@
+{
+  "name": "velnest-room",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "verify": "node verify-render.mjs",
+    "dev": "pwsh -NoProfile -File ../hf.ps1 preview --background",
+    "check": "pwsh -NoProfile -File ../hf.ps1 check",
+    "render": "pwsh -NoProfile -File ../hf.ps1 render --quality delivery --output renders/velnest-room.mp4"
+  }
+}
