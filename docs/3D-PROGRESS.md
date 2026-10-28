@@ -12,6 +12,10 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Character selection now uses a transparent Blender render of the actual skinned assets. Inspected the generated lineup; original concept images remain reference only.
+- Removed the obsolete hidden 2D participant/world tree and replaced overlapping legacy CSS with one token-based stylesheet. Production CSS dropped from 13.83 KB to 6.17 KB; type check and build passed. This stylesheet replacement still requires a fresh browser layout pass.
+- Root `DESIGN.md` records the current world, tokens, motion, and actual use/limitations of the five requested skills.
+
 - Refined the real meshes with beveled jacket, shirt, hem, trousers, shoe soles and straps; added cuffs, ears, fringe, and Muse's bob side panels. Skeleton dimensions and cosmetic sockets remain shared.
 - `art/blender/render_lineup.py` renders the editable assets as `characters-preview.png`; this still was inspected and shows the actual mesh lineup. Five-clip skin sampling passed for all three revised avatars.
 

@@ -41,3 +41,14 @@ scene.render.resolution_percentage=100
 scene.world.color=(.14,.14,.14)
 scene.render.filepath=str(ROOT/'art/blender/characters-preview.png')
 bpy.ops.render.render(write_still=True)
+# The selector uses the exact same geometry rather than concept-art stand-ins.
+camera.location=(0,-5,1.6)
+camera.rotation_euler=(Vector((0,0,.56))-camera.location).to_track_quat('-Z','Y').to_euler()
+camera.data.ortho_scale=2.9
+scene.render.film_transparent=True
+scene.render.resolution_x=1536
+scene.render.resolution_y=1024
+ground=[obj for obj in scene.objects if obj.type=='MESH' and obj.name.startswith('Plane')]
+for obj in ground:obj.hide_render=True
+scene.render.filepath=str(ROOT/'apps/web/public/avatars/identity-lineup.png')
+bpy.ops.render.render(write_still=True)

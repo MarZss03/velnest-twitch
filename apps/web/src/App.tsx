@@ -29,36 +29,6 @@ function World({ participants, connected, onNavigate, selfId }: { participants: 
       </div>
       <div className="world">
         <Room3D participants={participants} onNavigate={onNavigate} selfId={selfId} />
-        <div className="moon" />
-        <div className="hill hill-one" />
-        <div className="hill hill-two" />
-        <div className="pond" />
-        <div className="fire"><i /><i /><i /></div>
-        <div className="room-sign" aria-hidden="true">The afterparty<br /><small>Stay for one more game.</small></div>
-        <div className="stage-platform" aria-hidden="true" />
-        {participants.map((participant) => {
-          const avatar = AVATARS.find((item) => item.id === participant.avatarId) ?? AVATARS[0];
-          return (
-            <div
-              className="participant"
-              data-action={participant.action ?? "idle"}
-              key={participant.id}
-              style={{ left: `${participant.x}%`, top: `${participant.y}%` }}
-            >
-              <span className="nameplate">{participant.displayName}</span>
-              <span
-                className="avatar"
-                style={{
-                  "--avatar": avatar.color,
-                  "--accent": avatar.accent,
-                  backgroundImage: `url(${avatar.image})`,
-                  backgroundPosition: avatar.position
-                } as React.CSSProperties}
-              />
-              <span className="shadow" />
-            </div>
-          );
-        })}
         {participants.length === 0 && (
           <div className="empty-world">
             <span>Your community goes here.</span>
