@@ -12,6 +12,9 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Added Leave and change character: clears authoritative presence and navigation, returns to the selector, and retains appearance choices. A live socket check passed leave, presence removal, and rejoin as another identity on the same connection.
+- Selector and room share a 160 ms animation crossfade helper. GPU disposal now deduplicates geometries/materials and frees skeleton textures; late avatar/prop responses are discarded after disposal.
+
 - Added `VELNEST_Rig` with seven deform bones, armature modifiers, full vertex weights, and baked pose clips. Retained named control sockets so cosmetics stay compatible.
 - The animation verifier now requires SkinnedMesh instances, evaluates actual skinned vertex positions, checks finite deformation, and compares the left-arm skin deformation matrix to the authored control rotation during Cheer. All three characters passed, along with the existing five-clip behavior checks.
 

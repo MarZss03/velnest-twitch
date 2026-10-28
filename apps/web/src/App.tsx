@@ -250,6 +250,11 @@ export function App() {
           <World participants={participants} connected={connected} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} />
           <aside className="controller">
             <h2>Hey, {displayName}.</h2>
+            <button className="leave-room" type="button" onClick={()=>{
+              socket.emit('leaveRoom');
+              joinedProfile.current=null;
+              setJoined(false);
+            }}>Leave and change character</button>
             <p>Click the floor to walk around furniture. Use WASD, arrow keys, or hold the controls below to take over.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar onAction={(actionId) => socket.emit("performAction", actionId)} />

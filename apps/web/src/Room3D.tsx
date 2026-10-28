@@ -3,8 +3,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { floorHeight, fromWorld, type Participant } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
+import { createAnimator } from './animation';
+import { dispose3D } from './dispose3D';
 
-type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[]; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
+type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
 
 export function Room3D({ participants, onNavigate, selfId }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void; selfId?: string }) {
   const host = useRef<HTMLDivElement>(null);
@@ -73,9 +75,7 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
     let disposed = false;
     let frame = 0;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const disposeModel = (model: THREE.Object3D) => model.traverse(obj => {
-      if (obj instanceof THREE.Mesh) { obj.geometry.dispose(); const mats = Array.isArray(obj.material) ? obj.material : [obj.material]; mats.forEach(m => m.dispose()); }
-    });
+    const disposeModel = dispose3D;
     loader.load('/models/afterparty.glb', gltf => {
       if(disposed) { disposeModel(gltf.scene); return; }
       for(const name of ['Floor','Back wall','Sofa seat','Sofa back','Stage','Screen','Table','Table leg']) {
@@ -123,7 +123,8 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
             gltf.scene.position.set((p.x-50)/12,0,(p.y-50)/16);
             scene.add(gltf.scene);
             attachCosmetic(gltf.scene,p.cosmetic);
-            actors.set(p.id,{model:gltf.scene,mixer:new THREE.AnimationMixer(gltf.scene),clips:gltf.animations,target:new THREE.Vector3(),action:'',nonce:-1,label,cosmetic:p.cosmetic});
+            const mixer=new THREE.AnimationMixer(gltf.scene);
+            actors.set(p.id,{model:gltf.scene,mixer,animate:createAnimator(mixer,gltf.animations),target:new THREE.Vector3(),action:'',nonce:-1,label,cosmetic:p.cosmetic});
           },undefined,()=>{ pending.delete(p.id); failed.add(p.id); setError('A character could not load. Reload the room to retry.'); });
         }
         actor = actors.get(p.id);
@@ -138,9 +139,7 @@ export function Room3D({ participants, onNavigate, selfId }: { participants: Par
         const action=p.action??(walking?'walk':'idle');
         if(actor.action!==action || actor.nonce!==p.actionNonce) {
           actor.action=action; actor.nonce=p.actionNonce;
-          actor.mixer.stopAllAction();
-          const clip=actor.clips.find(c=>c.name.toLowerCase()===action);
-          if(clip && !reduced.matches) actor.mixer.clipAction(clip).reset().play();
+          actor.animate(action,reduced.matches);
         }
         if(!reduced.matches) actor.mixer.update(dt);
         const screen=actor.model.position.clone().add(new THREE.Vector3(0,1.2,0)).project(camera);

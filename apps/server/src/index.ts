@@ -123,6 +123,12 @@ io.on("connection", (socket) => {
     emitRoomState();
   });
 
+  socket.on('leaveRoom',()=>{
+    route=[];
+    participants.delete(socket.id);
+    emitRoomState();
+  });
+
   socket.on("disconnect", () => {
     clearInterval(navigation);
     participants.delete(socket.id);

@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { AvatarId, CosmeticId } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
+import { createAnimator } from './animation';
+import { dispose3D } from './dispose3D';
 
 export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: AvatarId; cosmetic?: CosmeticId }) {
   const host = useRef<HTMLDivElement>(null);
@@ -33,15 +35,12 @@ export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: Avata
     resize.observe(el);
     setStatus('Loading character…');
     new GLTFLoader().load(`/models/${avatarId}.glb`, gltf => {
-      if (disposed) return;
+      if (disposed) { dispose3D(gltf.scene); return; }
       scene.add(gltf.scene);
       attachCosmetic(gltf.scene, cosmetic);
       mixer = new THREE.AnimationMixer(gltf.scene);
-      play.current = name => {
-        mixer?.stopAllAction();
-        const clip = gltf.animations.find(a => a.name.toLowerCase() === name.toLowerCase());
-        if (clip && !matchMedia('(prefers-reduced-motion: reduce)').matches) mixer?.clipAction(clip).reset().play();
-      };
+      const animate=createAnimator(mixer,gltf.animations);
+      play.current=name=>animate(name,matchMedia('(prefers-reduced-motion: reduce)').matches);
       play.current('Idle');
       setStatus('Drag to turn. Choose an action.');
     }, undefined, () => setStatus('Could not load character. Select another to retry.'));
@@ -67,7 +66,7 @@ export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: Avata
       cancelAnimationFrame(frame);
       resize.disconnect();
       mixer?.stopAllAction();
-      scene.traverse(obj => { if (obj instanceof THREE.Mesh) { obj.geometry.dispose(); const mats = Array.isArray(obj.material) ? obj.material : [obj.material]; mats.forEach(m => m.dispose()); } });
+      dispose3D(scene);
       renderer.dispose();
       renderer.domElement.remove();
     };

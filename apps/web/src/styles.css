@@ -123,6 +123,8 @@ input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px #a5f3c615; }
 }
 
 /* Community room: one live stage, one entrance, one motion language. */
+.leave-room { border: 0; padding: 8px 0; min-height: 44px; background: none; color: var(--room-muted); text-decoration: underline; text-underline-offset: 4px; font-size: 13px; cursor: pointer; }
+.leave-room:hover { color: var(--room-ink); }
 .cosmetic-picker { margin-top: 20px; }
 .cosmetic-picker select { min-height: 44px; padding: 10px; border: 1px solid var(--room-line); border-radius: 8px; background: var(--room-panel); color: var(--room-ink); font: inherit; }
 .cosmetic-picker select:focus-visible { outline: 3px solid var(--room-accent); outline-offset: 3px; }

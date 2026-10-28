@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { dispose3D } from './dispose3D';
 import type { CosmeticId } from '@velnest/shared';
 
 /** Every item is authored in shared socket coordinates, never per-avatar offsets. */
@@ -18,8 +19,8 @@ export function attachCosmetic(model: THREE.Object3D, id: CosmeticId = 'none') {
   item.name = `cosmetic_${id}`;
   parent.add(item);
   new GLTFLoader().load(`/models/props/${id}.glb`, gltf => {
-    if (!item.visible || !item.parent || !model.parent) {
-      gltf.scene.traverse(child=>{if(child instanceof THREE.Mesh){child.geometry.dispose();(Array.isArray(child.material)?child.material:[child.material]).forEach(material=>material.dispose());}});
+    if (!item.visible || !item.parent || !model.parent || model.userData.disposed) {
+      dispose3D(gltf.scene);
       return;
     }
     // Both avatar joints and exported props already use glTF's Y-up frame.

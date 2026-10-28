@@ -54,5 +54,6 @@ export type ClientToServerEvents = {
   performAction: (actionId: ActionId) => void;
   changeCosmetic: (cosmetic: CosmeticId) => void;
   moveTo: (position: { x: number; y: number }) => void;
+  leaveRoom: () => void;
 };
 
