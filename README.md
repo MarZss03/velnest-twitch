@@ -19,11 +19,17 @@ Real Twitch sign-in requires an application configured in the Twitch Developer C
 
 ## Run locally
 
+Verified on Windows with Node.js **22.23.2** and pnpm **11.25.0**. The package-manager version is pinned in `package.json`. Exported 3D models and fonts are included: Blender is only needed to edit or regenerate the source assets.
+
+From the repository root in PowerShell:
+
 ```powershell
-pnpm install
+pnpm install --frozen-lockfile
 Copy-Item .env.example .env
 pnpm dev
 ```
+
+In a POSIX shell, use `cp .env.example .env` for the copy step. macOS/Linux have not been separately verified.
 
 Open `http://localhost:5173`. For an OBS Browser Source, use:
 
@@ -32,6 +38,8 @@ http://localhost:5173/?view=overlay
 ```
 
 The realtime server runs at `http://localhost:3001`.
+
+If port 5173 is occupied, Vite may select another port. Set `WEB_ORIGIN` in `.env` to the exact frontend origin printed by Vite, then restart the app. For a phone on the same trusted network, both `WEB_ORIGIN` and `VITE_REALTIME_URL` need the development computer's reachable network address instead of `localhost`; a responsive browser preview does not establish physical-phone connectivity.
 
 An editable 12-second Blender/HyperFrames motion study and its verified 1080p MP4 are in [art/motion/velnest-room](art/motion/velnest-room/README.md). This staged character sequence is separate from the required live Twitch contest demonstration.
 
@@ -48,6 +56,8 @@ pnpm test:seating
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.
+
+See [clean-clone verification](docs/REPRODUCIBILITY.md) for the tested public revision and the limits of that evidence.
 
 ## Project map
 
