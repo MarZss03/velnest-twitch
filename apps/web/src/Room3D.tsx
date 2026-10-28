@@ -6,12 +6,14 @@ import { attachCosmetic } from './cosmetics';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[]; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; cosmetic: string };
 
-export function Room3D({ participants, onNavigate }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void }) {
+export function Room3D({ participants, onNavigate, selfId }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void; selfId?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const people = useRef(participants);
   people.current = participants;
   const navigate=useRef(onNavigate);
   navigate.current=onNavigate;
+  const self=useRef(selfId);
+  self.current=selfId;
   const [error, setError] = useState('');
   useEffect(() => {
     const el = host.current;
@@ -95,6 +97,15 @@ export function Room3D({ participants, onNavigate }: { participants: Participant
       const dt = Math.min((now-last)/1000,.05);
       last = now;
       const ids = new Set(people.current.map(p=>p.id));
+      const player=people.current.find(person=>person.id===self.current);
+      if(camera.aspect<.85 && player) {
+        const x=(player.x-50)/12, z=(player.y-50)/16;
+        camera.position.set(x,4,z+5.6);
+        camera.lookAt(x,.35,z-.45);
+      } else {
+        camera.position.set(0,7,camera.aspect<1?16:10);
+        camera.lookAt(0,0,0);
+      }
       actors.forEach((actor,id) => { if (!ids.has(id)) { scene.remove(actor.model); actor.mixer.stopAllAction(); disposeModel(actor.model); actor.label.remove(); actors.delete(id); } });
       for (const p of people.current) {
         let actor = actors.get(p.id);

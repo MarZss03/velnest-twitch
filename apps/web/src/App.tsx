@@ -20,7 +20,7 @@ type Direction = { dx: number; dy: number };
 const realtimeUrl = import.meta.env.VITE_REALTIME_URL ?? "http://localhost:3001";
 const isOverlay = new URLSearchParams(window.location.search).get("view") === "overlay";
 
-function World({ participants, connected, onNavigate }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void }) {
+function World({ participants, connected, onNavigate, selfId }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void; selfId?: string }) {
   return (
     <section className="world-shell" aria-label="VELNEST shared world">
       <div className="world-topline">
@@ -28,7 +28,7 @@ function World({ participants, connected, onNavigate }: { participants: Particip
         <span>{participants.length} inside</span>
       </div>
       <div className="world">
-        <Room3D participants={participants} onNavigate={onNavigate} />
+        <Room3D participants={participants} onNavigate={onNavigate} selfId={selfId} />
         <div className="moon" />
         <div className="hill hill-one" />
         <div className="hill hill-two" />
@@ -247,7 +247,7 @@ export function App() {
         </section>
       ) : (
         <section className="play-layout">
-          <World participants={participants} connected={connected} onNavigate={position=>socket.emit('moveTo',position)} />
+          <World participants={participants} connected={connected} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} />
           <aside className="controller">
             <h2>Hey, {displayName}.</h2>
             <p>Click the floor to walk around furniture. Use WASD, arrow keys, or hold the controls below to take over.</p>

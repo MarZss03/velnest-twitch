@@ -12,6 +12,10 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Inspected the join flow at 390×844: character choice, cosmetic select, and Enter button remain reachable with no visible horizontal overflow. Entered as Arc with Lightstick.
+- Added a portrait camera following the local participant so the player remains legible. Desktop and OBS retain the overview. The revised portrait frame was visually inspected.
+- A second browser entered as Muse with Backpack; OBS visibly showed both names and distinct models in the authored environment. Triggered Cheer, but a still screenshot does not verify its full motion; exported animation-channel correctness still needs inspection.
+
 - Browser control recovered after resetting its session. The live join screen was inspected with the authored room and headphones. This exposed a full-ring headset crossing the face, a duplicated coordinate rotation, and shadow acne across the floor.
 - Rebuilt headphones with an upper arc, removed the redundant Y-up conversion, and adjusted shadow bias. Follow-up live screenshots confirmed the face is clear and floor stripe artifacts are removed. Reduced preview height and removed the join panel's empty top offset.
 - This is a targeted desktop review, not an all-character, all-prop, mobile, or animation visual approval.
