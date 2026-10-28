@@ -106,5 +106,11 @@ for identity in ['riff','arc','muse']:
             track.strips.new(clip,1,action)
             obj.animation_data.action=None
     bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender'/f'{identity}.blend'))
-    bpy.ops.export_scene.gltf(filepath=str(OUT/f'{identity}.glb'),export_format='GLB',export_animations=True,export_animation_mode='NLA_TRACKS')
+    bpy.ops.export_scene.gltf(
+        filepath=str(OUT/f'{identity}.glb'),export_format='GLB',
+        export_animations=True,export_animation_mode='NLA_TRACKS',
+        export_force_sampling=True,export_bake_animation=True,
+        export_optimize_animation_size=False,
+        export_optimize_animation_keep_anim_object=True,
+    )
 print('VELNEST avatar library exported to', OUT)

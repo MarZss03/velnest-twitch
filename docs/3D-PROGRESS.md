@@ -12,6 +12,10 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- Export inspection found Cheer omitted constant raised-arm channels. Disabled animation-size pruning and enabled full transform baking in Blender. Every clip now includes the six animated joints' translation, rotation, and scale channels, preserving held poses and reset values.
+- `pnpm test:animations` loads all three GLBs through the actual Three.js GLTFLoader and AnimationMixer. It samples five clips and verifies raised arms, jump height, wave motion, opposing walk samples, dance motion, and restoration of idle arm/root transforms. All three identities passed.
+- These checks prove sampled joint motion in the web animation engine; they do not replace full visual review or a production skinned rig.
+
 - Inspected the join flow at 390×844: character choice, cosmetic select, and Enter button remain reachable with no visible horizontal overflow. Entered as Arc with Lightstick.
 - Added a portrait camera following the local participant so the player remains legible. Desktop and OBS retain the overview. The revised portrait frame was visually inspected.
 - A second browser entered as Muse with Backpack; OBS visibly showed both names and distinct models in the authored environment. Triggered Cheer, but a still screenshot does not verify its full motion; exported animation-channel correctness still needs inspection.
