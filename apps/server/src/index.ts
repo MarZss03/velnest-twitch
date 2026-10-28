@@ -42,6 +42,7 @@ function cleanDisplayName(value: string) {
 }
 
 io.on("connection", (socket) => {
+  let lastMove=0, lastAction=0, lastJoin=0;
   let route: {x:number;y:number}[]=[];
   const navigation=setInterval(()=>{
     const participant=participants.get(socket.id);
@@ -57,7 +58,7 @@ io.on("connection", (socket) => {
     emitRoomState();
   },70);
   socket.on('moveTo',position=>{
-    if(!position || !canOccupy(position.x,position.y)) return;
+    if(!position || typeof position.x!=='number' || typeof position.y!=='number' || !canOccupy(position.x,position.y)) return;
     const participant=participants.get(socket.id);
     if(!participant) return;
     route=findRoomPath(participant,position);
@@ -66,8 +67,12 @@ io.on("connection", (socket) => {
   // snapshot immediately instead of waiting for the next player event.
   socket.emit("roomState", [...participants.values()]);
 
-  socket.on("joinRoom", ({ displayName, avatarId, cosmetic }) => {
-    if (!allowedAvatarIds.has(avatarId)) return;
+  socket.on("joinRoom", (payload) => {
+    if (!payload || typeof payload.displayName!=='string' || typeof payload.avatarId!=='string' || !allowedAvatarIds.has(payload.avatarId)) return;
+    const now=Date.now();
+    if(now-lastJoin<300) return;
+    lastJoin=now;
+    const {displayName,avatarId,cosmetic}=payload;
 
     let x=20 + Math.round(Math.random()*60);
     let y=24 + Math.round(Math.random()*52);
@@ -85,7 +90,12 @@ io.on("connection", (socket) => {
     emitRoomState();
   });
 
-  socket.on("move", ({ dx, dy }) => {
+  socket.on("move", (payload) => {
+    if(!payload || typeof payload.dx!=='number' || typeof payload.dy!=='number' || !Number.isFinite(payload.dx) || !Number.isFinite(payload.dy)) return;
+    const now=Date.now();
+    if(now-lastMove<40) return;
+    lastMove=now;
+    const {dx,dy}=payload;
     route=[];
     const participant = participants.get(socket.id);
     if (!participant) return;
@@ -102,6 +112,9 @@ io.on("connection", (socket) => {
   socket.on("performAction", (actionId) => {
     const participant = participants.get(socket.id);
     if (!participant || !allowedActionIds.has(actionId)) return;
+    const now=Date.now();
+    if(now-lastAction<250) return;
+    lastAction=now;
 
     const actionNonce = Date.now();
     participant.action = actionId as ActionId;

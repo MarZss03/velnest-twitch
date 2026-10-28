@@ -20,7 +20,9 @@ export function AvatarPreview({ avatarId, cosmetic = 'none' }: { avatarId: Avata
     const camera = new THREE.PerspectiveCamera(32, 1, .01, 20);
     camera.position.set(1.1, .9, 2.3);
     camera.lookAt(0, .55, 0);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    let renderer: THREE.WebGLRenderer;
+    try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); }
+    catch { setStatus('3D preview unavailable. You can still choose a character below.'); return; }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     el.appendChild(renderer.domElement);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x74677f, 2.2));
