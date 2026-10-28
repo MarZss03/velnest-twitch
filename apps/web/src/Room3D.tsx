@@ -60,6 +60,15 @@ export function Room3D({ participants }: { participants: Participant[] }) {
     const disposeModel = (model: THREE.Object3D) => model.traverse(obj => {
       if (obj instanceof THREE.Mesh) { obj.geometry.dispose(); const mats = Array.isArray(obj.material) ? obj.material : [obj.material]; mats.forEach(m => m.dispose()); }
     });
+    loader.load('/models/afterparty.glb', gltf => {
+      if(disposed) { disposeModel(gltf.scene); return; }
+      for(const name of ['Floor','Back wall','Sofa seat','Sofa back','Stage','Screen','Table','Table leg']) {
+        const fallback=scene.getObjectByName(name);
+        if(fallback) { fallback.removeFromParent(); disposeModel(fallback); }
+      }
+      gltf.scene.traverse(obj=>{if(obj instanceof THREE.Mesh){obj.receiveShadow=true;obj.castShadow=true;}});
+      scene.add(gltf.scene);
+    },undefined,()=>{ /* The basic room remains usable when environment loading fails. */ });
     const resize = new ResizeObserver(() => {
       renderer.setSize(el.clientWidth, el.clientHeight);
       camera.aspect = el.clientWidth / Math.max(1,el.clientHeight);

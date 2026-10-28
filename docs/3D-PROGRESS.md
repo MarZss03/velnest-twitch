@@ -12,6 +12,9 @@ Browser review confirmed the room and character render successfully. Remaining: 
 
 ## Latest verification
 
+- The authored Afterparty environment is built in Blender by `art/blender/build_room.py`: rounded upholstered sofa, cushions, coffee table, rug, stage, wall display, original VELNEST lettering, and potted plants. Editable source: `afterparty.blend`; web asset: `models/afterparty.glb`; inspected Cycles still: `art/blender/afterparty-preview.png`.
+- The web room loads this environment and disposes the blockout geometry on success. A load failure retains the blockout. Type check and production build passed after integration.
+
 - Shared headphones, backpack, and lightstick attach through identical named GLB sockets. The selection is shown in the 3D preview and included in authoritative room state, including reconnect joins.
 - GLB node inspection verified Head, slot_back, and slot_hand_R exist on every identity. Socket client verification passed persistence of a valid cosmetic and fallback to Original for an untrusted ID.
 - Prop source now lives in `art/blender/build_props.py`, with editable headphones, backpack, and lightstick `.blend` files and exported GLBs under `apps/web/public/models/props/`. The renderer loads these assets into the shared socket frame and retains a geometric fallback on load failure.
