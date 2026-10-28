@@ -69,11 +69,26 @@ function World({ participants, connected }: { participants: Participant[]; conne
 }
 
 function Dpad({ onMove }: { onMove: (direction: Direction) => void }) {
+  const held = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stop = () => { if (held.current) clearInterval(held.current); held.current = null; };
+  useEffect(() => {
+    window.addEventListener('blur', stop);
+    return () => { stop(); window.removeEventListener('blur', stop); };
+  }, []);
   const button = (label: string, direction: Direction, className: string) => (
     <button
       className={className}
       aria-label={label}
-      onPointerDown={() => onMove(direction)}
+      onPointerDown={(event) => {
+        event.preventDefault();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        stop(); onMove(direction);
+        held.current = setInterval(() => onMove(direction), 70);
+      }}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      onLostPointerCapture={stop}
+      onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onMove(direction); } }}
       type="button"
     >
       {label}
@@ -135,21 +150,35 @@ export function App() {
 
   useEffect(() => {
     if (!joined || isOverlay) return;
+    const keys = new Set<string>();
+    const directions: Record<string, Direction> = {
+      ArrowUp: { dx: 0, dy: -1 }, w: { dx: 0, dy: -1 },
+      ArrowDown: { dx: 0, dy: 1 }, s: { dx: 0, dy: 1 },
+      ArrowLeft: { dx: -1, dy: 0 }, a: { dx: -1, dy: 0 },
+      ArrowRight: { dx: 1, dy: 0 }, d: { dx: 1, dy: 0 }
+    };
+    const tick = () => {
+      let dx=0, dy=0;
+      keys.forEach(key => { dx+=directions[key].dx; dy+=directions[key].dy; });
+      const length=Math.hypot(dx,dy);
+      if(length) socket.emit('move',{dx:dx/length,dy:dy/length});
+    };
     const onKeyDown = (event: KeyboardEvent) => {
-      const directions: Record<string, Direction> = {
-        ArrowUp: { dx: 0, dy: -1 }, w: { dx: 0, dy: -1 },
-        ArrowDown: { dx: 0, dy: 1 }, s: { dx: 0, dy: 1 },
-        ArrowLeft: { dx: -1, dy: 0 }, a: { dx: -1, dy: 0 },
-        ArrowRight: { dx: 1, dy: 0 }, d: { dx: 1, dy: 0 }
-      };
-      const direction = directions[event.key];
+      if (event.target instanceof HTMLElement && event.target.closest('input,textarea,[contenteditable="true"]')) return;
+      const key=event.key.length===1?event.key.toLowerCase():event.key;
+      const direction = directions[key];
       if (direction) {
         event.preventDefault();
-        socket.emit("move", direction);
+        if(!keys.has(key)) { keys.add(key); tick(); }
       }
     };
+    const onKeyUp=(event: KeyboardEvent) => keys.delete(event.key.length===1?event.key.toLowerCase():event.key);
+    const clear=()=>keys.clear();
+    const interval=setInterval(tick,70);
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener('keyup',onKeyUp);
+    window.addEventListener('blur',clear);
+    return () => { clearInterval(interval); window.removeEventListener("keydown", onKeyDown); window.removeEventListener('keyup',onKeyUp); window.removeEventListener('blur',clear); };
   }, [joined, socket]);
 
   const join = () => {

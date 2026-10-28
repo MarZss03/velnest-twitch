@@ -51,6 +51,7 @@ export function Room3D({ participants }: { participants: Participant[] }) {
     box('Table leg',[.15,.5,.15],[-1.5,.2,.1],'#d7b68d');
     const actors = new Map<string,Actor>();
     const pending = new Set<string>();
+    const failed = new Set<string>();
     const loader = new GLTFLoader();
     let disposed = false;
     let frame = 0;
@@ -73,7 +74,7 @@ export function Room3D({ participants }: { participants: Participant[] }) {
       actors.forEach((actor,id) => { if (!ids.has(id)) { scene.remove(actor.model); actor.mixer.stopAllAction(); disposeModel(actor.model); actor.label.remove(); actors.delete(id); } });
       for (const p of people.current) {
         let actor = actors.get(p.id);
-        if (!actor && !pending.has(p.id)) {
+        if (!actor && !pending.has(p.id) && !failed.has(p.id)) {
           pending.add(p.id);
           loader.load(`/models/${p.avatarId}.glb`, gltf => {
             pending.delete(p.id);
@@ -87,13 +88,16 @@ export function Room3D({ participants }: { participants: Participant[] }) {
             gltf.scene.position.set((p.x-50)/12,0,(p.y-50)/16);
             scene.add(gltf.scene);
             actors.set(p.id,{model:gltf.scene,mixer:new THREE.AnimationMixer(gltf.scene),clips:gltf.animations,target:new THREE.Vector3(),action:'',nonce:-1,label});
-          },undefined,()=>{ pending.delete(p.id); setError('A character could not load. Reload the room to retry.'); });
+          },undefined,()=>{ pending.delete(p.id); failed.add(p.id); setError('A character could not load. Reload the room to retry.'); });
         }
         actor = actors.get(p.id);
         if (!actor) continue;
         actor.target.set((p.x-50)/12,0,(p.y-50)/16);
+        const delta=actor.target.clone().sub(actor.model.position);
+        const walking=delta.lengthSq()>.0004;
+        if(walking) actor.model.rotation.y=Math.atan2(delta.x,delta.z);
         actor.model.position.lerp(actor.target,reduced.matches?1:1-Math.exp(-dt*14));
-        const action=p.action??'idle';
+        const action=p.action??(walking?'walk':'idle');
         if(actor.action!==action || actor.nonce!==p.actionNonce) {
           actor.action=action; actor.nonce=p.actionNonce;
           actor.mixer.stopAllAction();

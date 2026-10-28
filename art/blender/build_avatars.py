@@ -56,6 +56,7 @@ for identity in ['riff','arc','muse']:
     for x in [-.073,.073]:
         shape('Eye', (x,-.181,-.005), (.018,.014,.029), dark, head)
     arms=[]
+    legs=[]
     for sign, side in [(-1,'L'),(1,'R')]:
         arm=joint('Arm_'+side,(sign*.16,0,.09),body)
         shape('Sleeve_'+side,(sign*.045,0,-.09),(.075,.083,.13),purple,arm)
@@ -63,6 +64,7 @@ for identity in ['riff','arc','muse']:
         joint('slot_hand_'+side,(sign*.065,-.04,-.24),arm)
         arms.append(arm)
         leg=joint('Leg_'+side,(sign*.085,0,.34),root)
+        legs.append(leg)
         shape('Trousers_'+side,(0,0,-.085),(.071,.083,.11),cream if identity=='muse' else purple,leg)
         shape('Shoe_'+side,(0,-.035,-.25),(.08,.115,.06),cream,leg)
     if identity=='riff':
@@ -75,8 +77,9 @@ for identity in ['riff','arc','muse']:
         shape('Long overshirt',(0,.015,-.12),(.19,.12,.14),purple,body)
     for name, pos, parent in [('slot_head',(0,0,.25),head),('slot_face',(0,-.20,0),head),('slot_back',(0,.13,.04),body),('slot_chest',(0,-.14,.05),body)]: joint(name,pos,parent)
     bpy.context.scene.render.fps=30
-    for clip in ['Idle','Wave','Cheer','Dance']:
-        for obj in [root,body,*arms]:
+    animated = [root,body,*arms,*legs]
+    for clip in ['Idle','Walk','Wave','Cheer','Dance']:
+        for obj in animated:
             if obj.animation_data:
                 obj.animation_data.action = None
             obj.rotation_euler=(0,0,0)
@@ -86,10 +89,16 @@ for identity in ['riff','arc','muse']:
             body.rotation_euler.y=math.sin(t)*(.16 if clip=='Dance' else .025)
             arms[1].rotation_euler.y=(-1.9+math.sin(t*2)*.3) if clip=='Wave' else (-1.7 if clip=='Cheer' else math.sin(t)*.22)
             arms[0].rotation_euler.y=1.7 if clip=='Cheer' else -math.sin(t)*.22 if clip=='Dance' else 0
-            for obj in [root,body,*arms]:
+            for index, leg in enumerate(legs):
+                leg.rotation_euler.x = math.sin(t*2+index*math.pi)*.42 if clip=='Walk' else 0
+            if clip=='Walk':
+                arms[0].rotation_euler.x=math.sin(t*2)*.28
+                arms[1].rotation_euler.x=-math.sin(t*2)*.28
+                root.location.z=abs(math.sin(t*2))*.025
+            for obj in animated:
                 obj.keyframe_insert(data_path='location',frame=frame)
                 obj.keyframe_insert(data_path='rotation_euler',frame=frame)
-        for obj in [root,body,*arms]:
+        for obj in animated:
             action=obj.animation_data.action
             action.name=clip+'_'+obj.name
             track=obj.animation_data.nla_tracks.new()
