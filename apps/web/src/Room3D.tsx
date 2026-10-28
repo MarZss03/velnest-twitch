@@ -9,7 +9,7 @@ import { createRoomMotion } from './roomMotion';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; cosmetic: string };
 
-export function Room3D({ participants, onNavigate, onSit, selfId }: { participants: Participant[]; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
+export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, selfId }: { participants: Participant[]; occupancyKnown?:boolean; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const people = useRef(participants);
   people.current = participants;
@@ -167,7 +167,7 @@ export function Room3D({ participants, onNavigate, onSit, selfId }: { participan
           if(p.action && actor.nonce!==p.actionNonce) motion.emit(p.action,actor.model.position,AVATARS.find(a=>a.id===p.avatarId)!.color,reduced.matches);
           actor.action=action; actor.nonce=p.actionNonce;
           actor.label.dataset.action=p.action??'';
-          actor.label.textContent=p.seat?.status==='seated' ? `${p.displayName} · seated` : p.action ? `${p.displayName} · ${p.action}` : p.displayName;
+          actor.label.textContent=p.seat?.status==='seated' ? `${p.displayName} (seated)` : p.action ? `${p.displayName} (${p.action})` : p.displayName;
           actor.labelWidth=actor.label.offsetWidth;
           actor.animate(action,reduced.matches);
         }
@@ -192,7 +192,7 @@ export function Room3D({ participants, onNavigate, onSit, selfId }: { participan
     frame=requestAnimationFrame(render);
     return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
   },[]);
-  return <div className="room-3d" ref={host} aria-label={`3D community room with ${participants.length} participants`}>
+  return <div className="room-3d" ref={host} aria-label={occupancyKnown?`3D community room with ${participants.length} participants`:'3D community room preview; occupancy unavailable'}>
     {error && <p className="room-error" role="alert">{error}</p>}
   </div>;
 }

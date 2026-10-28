@@ -17,6 +17,7 @@ import {
   type ServerToClientEvents
 } from "@velnest/shared";
 
+/** Each runtime or integration test owns an isolated room and session store. */
 export async function createRoomServer(config: AuthConfig = authConfigFromEnv(), dependencies: { fetch?: typeof fetch; now?: () => number; logger?: boolean } = {}) {
 const webOrigin = config.webOrigin;
 const app = Fastify({ logger: dependencies.logger===false ? false : { serializers: { req: req => ({ method: req.method, url: req.url?.split('?')[0], hostname: req.hostname, remoteAddress: req.ip }) } } });

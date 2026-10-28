@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "pnpm build && concurrently --kill-others-on-fail -n types,api \"tsc -p tsconfig.json --watch --preserveWatchOutput\" \"node --watch dist/index.js\"",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

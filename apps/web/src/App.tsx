@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
-import { AvatarPreview } from './AvatarPreview';
-import { Room3D } from './Room3D';
+import {SceneBoundary} from './SceneBoundary';
 import {
   AVATARS,
   ACTIONS,
@@ -17,6 +16,9 @@ import {
   type RoomConfig,
   type ServerToClientEvents
 } from "@velnest/shared";
+
+const AvatarPreview=lazy(()=>import('./AvatarPreview').then(module=>({default:module.AvatarPreview})));
+const Room3D=lazy(()=>import('./Room3D').then(module=>({default:module.Room3D})));
 
 type VelnestSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 type Direction = { dx: number; dy: number };
@@ -34,19 +36,21 @@ const showWorld=()=>{
   document.getElementById('community-world')?.focus({preventScroll:true});
 };
 
-function World({ participants, connected, onNavigate, onSit, selfId }: { participants: Participant[]; connected: boolean; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
+function World({ participants, connected, connecting=false, onNavigate, onSit, selfId }: { participants: Participant[]; connected: boolean; connecting?:boolean; onNavigate?: (position:{x:number;y:number})=>void; onSit?: (seatId:SeatId)=>void; selfId?: string }) {
   return (
     <section id="community-world" className="world-shell" tabIndex={-1} aria-label="VELNEST shared world">
       <div className="world-topline">
-        {connected ? "Connected to the nest" : "Reconnecting…"}
-        <span>{participants.length} inside</span>
+        {connected ? "Connected to the nest" : connecting ? 'Connecting to the nest…' : 'Live room unavailable'}
+        <span>{connected ? `${participants.length} inside` : 'Occupancy unavailable'}</span>
       </div>
       <div className="world">
-        <Room3D participants={participants} onNavigate={onNavigate} onSit={onSit} selfId={selfId} />
-        {participants.length === 0 && (
+        <SceneBoundary><Suspense fallback={<div className="room-loading" role="status">Opening the room…</div>}>
+          <Room3D participants={connected?participants:[]} occupancyKnown={connected} onNavigate={connected?onNavigate:undefined} onSit={connected?onSit:undefined} selfId={selfId} />
+        </Suspense></SceneBoundary>
+        {(!connected || participants.length === 0) && (
           <div className="empty-world">
-            <span>Your community goes here.</span>
-            Choose your character and make yourself at home.
+            <span>{connected?'Your community goes here.':connecting?'Connecting to the room…':'Live room unavailable'}</span>
+            {connected?'Choose your character and make yourself at home.':connecting?'Your community will appear once connected.':'Your connection will retry automatically.'}
           </div>
         )}
       </div>
@@ -77,17 +81,17 @@ function Dpad({ onMove }: { onMove: (direction: Direction) => void }) {
       onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onMove(direction); } }}
       type="button"
     >
-      {label}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 19V5m-5 5 5-5 5 5" /></svg>
     </button>
   );
 
   return (
     <div className="dpad">
-      {button("↑", { dx: 0, dy: -1 }, "up")}
-      {button("←", { dx: -1, dy: 0 }, "left")}
+      {button("Move up", { dx: 0, dy: -1 }, "up")}
+      {button("Move left", { dx: -1, dy: 0 }, "left")}
       <span className="dpad-center" />
-      {button("→", { dx: 1, dy: 0 }, "right")}
-      {button("↓", { dx: 0, dy: 1 }, "down")}
+      {button("Move right", { dx: 1, dy: 0 }, "right")}
+      {button("Move down", { dx: 0, dy: 1 }, "down")}
     </div>
   );
 }
@@ -154,6 +158,8 @@ export function App() {
   useEffect(() => {
     const onConnect = () => {
       setConnected(true);
+      // The API may become available after the page during local startup.
+      setAccountAttempt(attempt=>attempt+1);
       if (!isOverlay && joinedProfile.current) {
         socket.emit("joinRoom", joinedProfile.current);
       }
@@ -222,6 +228,10 @@ export function App() {
   };
   const selfParticipant=participants.find(person=>person.id===socket.id);
   const requestSeat=(seatId:SeatId)=>{ setInteractionMessage(''); socket.emit('sit',seatId); showWorld(); };
+  const unavailable=Boolean(accountError)||(!connected&&!accountLoading);
+  const connecting=!connected&&accountLoading&&!accountError;
+  const connectionMessage=accountError||(!connected&&!accountLoading?'The live room is offline. Retry the connection to enter.':'');
+  const retryConnection=()=>{setAccountAttempt(attempt=>attempt+1);socket.connect();};
 
   const signOut=async()=>{
     setAccountLoading(true);
@@ -236,18 +246,18 @@ export function App() {
   };
 
   if (isOverlay) {
-    return <main className="overlay"><World participants={participants} connected={connected} /></main>;
+    return <main className="overlay"><World participants={participants} connected={connected} connecting={connecting} /></main>;
   }
 
   return (
     <main className="app-shell">
       <header>
-        <a className="brand" href="/">velnest<span> / </span>the community room</a>
-        <div className="mock-pill">{roomConfig?.mockMode ? 'Local demo' : roomConfig ? 'Twitch community' : 'Connecting…'}</div>
+        <a className="brand" href="/" aria-label="VELNEST community room">velnest<span className="brand-context"> / the community room</span></a>
+        <div className="mock-pill">{unavailable?'Connection unavailable':roomConfig?.mockMode ? 'Local demo' : roomConfig ? 'Twitch community' : 'Connecting…'}</div>
       </header>
-      {(roomError || accountError) && <div className="connection-message" role="alert">
-        {accountError || roomError}
-        {accountError && <button type="button" onClick={()=>setAccountAttempt(attempt=>attempt+1)}>Retry connection</button>}
+      {(roomError || connectionMessage) && <div className="connection-message" role="alert">
+        {connectionMessage || roomError}
+        {connectionMessage && <button type="button" onClick={retryConnection}>Retry connection</button>}
       </div>}
 
       {!joined ? (
@@ -255,10 +265,10 @@ export function App() {
           <div className="intro">
             <h1>Meet you in the nest.</h1>
             <p className="lede">Your Twitch community, hanging out between the good moments.</p>
-            <World participants={participants} connected={connected} />
+            <World participants={participants} connected={connected} connecting={connecting} />
           </div>
 
-          <div className="join-card">
+          <div className="identity-rail">
             <h2>Make an entrance.</h2>
             {roomConfig?.mockMode ? <label>
               <span>Your name</span>
@@ -266,7 +276,7 @@ export function App() {
             </label> : account ? <div className="account-identity">
               <span>Signed in as <strong>{account.displayName}</strong></span>
               <button type="button" onClick={signOut} disabled={accountLoading}>Sign out</button>
-            </div> : <p className="account-note">{accountLoading ? 'Checking your connection…' : 'Bring your Twitch identity into the room.'}</p>}
+            </div> : <p className="account-note">{accountLoading ? 'Checking your connection…' : unavailable?'Reconnect to choose your room identity.':'Bring your Twitch identity into the room.'}</p>}
             <div className="step">Pick your character</div>
             <div className="avatar-grid">
               {AVATARS.map((avatar) => (
@@ -290,23 +300,23 @@ export function App() {
                 {COSMETICS.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </label>
-            {roomConfig && !roomConfig.mockMode && !account && roomConfig.oauthConfigured && !accountLoading && !accountError ?
+            {roomConfig && !roomConfig.mockMode && !account && roomConfig.oauthConfigured && connected && !accountLoading && !accountError ?
               <a className="enter-button twitch-signin" href={`${realtimeUrl}/auth/twitch`}>Connect with Twitch</a> :
               <button className="enter-button" onClick={join} disabled={!displayName.trim() || !connected || accountLoading || Boolean(accountError) || !roomConfig || (!roomConfig.mockMode && (!account || account.role==='viewer'))} type="button">
-                {accountLoading ? 'Checking connection…' : !connected ? 'Reconnecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : 'Enter the room'}
+                {unavailable?'Connection unavailable':accountLoading ? 'Checking connection…' : !connected ? 'Connecting…' : roomConfig && !roomConfig.mockMode && !roomConfig.oauthConfigured ? 'Twitch connection pending' : account?.role==='viewer' && !roomConfig?.mockMode ? 'Subscriber access required' : 'Enter the room'}
               </button>}
-            <p className="demo-note">{roomConfig?.mockMode ? 'Local demo · Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : 'Sign in to verify your place in the channel community.'}</p>
+            <p className="demo-note">{unavailable?'Use Retry connection above to reconnect. You can inspect the characters while you wait.':roomConfig?.mockMode ? 'Local demo. Choose a name and try the shared room.' : account?.role==='viewer' ? 'You’re signed in. This room is open to this channel’s subscribers and broadcaster; everyone can watch.' : roomConfig && !roomConfig.oauthConfigured ? 'This room is waiting for its Twitch connection.' : 'Sign in to verify your place in the channel community.'}</p>
             <details className="preview-details" onToggle={event=>setPreviewOpen(event.currentTarget.open)}>
               <summary>Inspect character and animations</summary>
-              {previewOpen && <AvatarPreview avatarId={avatarId} cosmetic={cosmetic} />}
+              {previewOpen && <SceneBoundary><Suspense fallback={<div className="preview-loading" role="status">Opening character preview…</div>}><AvatarPreview avatarId={avatarId} cosmetic={cosmetic} /></Suspense></SceneBoundary>}
             </details>
           </div>
         </section>
       ) : (
         <section className="play-layout">
-          <World participants={participants} connected={connected} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} onSit={requestSeat} />
+          <World participants={participants} connected={connected} connecting={connecting} selfId={socket.id} onNavigate={position=>socket.emit('moveTo',position)} onSit={requestSeat} />
           <aside className="controller">
-            <h2>Hey, {displayName}.</h2>
+            <h1>Hey, {displayName}.</h1>
             <button className="leave-room" type="button" onClick={()=>{
               socket.emit('leaveRoom');
               joinedProfile.current=null;
@@ -339,7 +349,7 @@ export function App() {
               </select>
             </label>
             <div className="obs-note">
-              <span>OBS BROWSER SOURCE</span>
+              <span>OBS browser source</span>
               <code>{overlayUrl}</code>
             </div>
           </aside>
