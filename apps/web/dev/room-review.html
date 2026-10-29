@@ -15,6 +15,11 @@ const samples=()=>[
 ];
 function Review(){
  const [people,setPeople]=useState(samples);
+ const testRecovery=()=>{
+  const canvas=document.querySelector('#stage canvas');
+  const extension=canvas?.getContext('webgl2')?.getExtension('WEBGL_lose_context');
+  if(extension){extension.loseContext();setTimeout(()=>extension.restoreContext(),3000);}
+ };
  const update=values=>setPeople(old=>old.map((p,i)=>i===0?{...p,...values,actionNonce:p.actionNonce+1}:p));
  const crowd=()=>{
   const grid=[];for(let y=25;y<=85;y+=15)for(let x=10;x<=90;x+=12)if(canOccupy(x,y))grid.push({x,y});
@@ -23,7 +28,8 @@ function Review(){
  return h(React.Fragment,null,h('header',null,h('p',null,'LOCAL ART REVIEW · Simulated participants · No Twitch session'),
   h('button',{onClick:()=>setPeople(samples())},'Three characters'),h('button',{onClick:crowd},'24 characters'),
   h('button',{onClick:()=>update({...SEATS[1].position,seat:{id:SEATS[1].id,status:'seated'},action:null})},'Sit'),
-  h('button',{onClick:()=>update({...fromWorld(-.2,1.1),seat:null,action:'dance'})},'Dance')),
+  h('button',{onClick:()=>update({...fromWorld(-.2,1.1),seat:null,action:'dance'})},'Dance'),
+  h('button',{onClick:testRecovery},'Test graphics recovery')),
   h('main',{id:'stage'},h(Room3D,{participants:people,onNavigate:position=>update({...position,seat:null,action:null}),onSit:id=>{const seat=SEATS.find(s=>s.id===id);if(seat)update({...seat.position,seat:{id,status:'seated'},action:null});}})));
 }
 if(import.meta.env.DEV)createRoot(document.getElementById('root')).render(h(Review));

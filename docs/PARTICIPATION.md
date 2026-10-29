@@ -2,7 +2,9 @@
 
 Last project QA: **2026-10-29 (America/New_York)**. Account/form status below was last inspected October 28.
 
-October 29 update: the night lounge renders in OBS and has a verified 27.5-second local recording on D:. Software x264 output was inspected after a missing-NVIDIA-encoder startup notice. OBS was later closed to release idle QA resources. The earlier Settings-page handoff below is historical. The complete eleven-suite QA passes; see [QA report](QA-2026-10-29.md). No public stream or final contest submission was made.
+October 29 update: the night lounge renders in OBS and has a verified 27.5-second local recording on D:. Software x264 output was inspected after a missing-NVIDIA-encoder startup notice. OBS was later closed to release idle QA resources. The earlier Settings-page handoff below is historical. The complete twelve-suite QA passes; see [QA report](QA-2026-10-29.md). No public stream or final contest submission was made.
+
+Current follow-up: OBS is connected to meemokiller. Devpost cover and three gallery images uploaded successfully; captions and project details are prepared in the open form. The required YouTube URL is still missing, so the details step is not confirmed saved. Graphics recovery passes a browser fixture test and twelve local QA suites; sustained recording and the public demonstration are next.
 
 Official page: https://twitchcon-codex.devpost.com/  
 Official rules: https://twitchcon-codex.devpost.com/rules  

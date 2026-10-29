@@ -47,7 +47,10 @@ export function createNightLighting(renderer:THREE.WebGLRenderer,scene:THREE.Sce
   const output=new OutputPass();
   composer.addPass(output);
   return {
-    resize:(width:number,height:number)=>composer.setSize(width,height),
+    resize:(width:number,height:number)=>{
+      composer.setPixelRatio(Math.min(renderer.getPixelRatio(),1.25));
+      composer.setSize(width,height);
+    },
     render:()=>composer.render(),
     dispose:()=>{
       scene.environment=null;

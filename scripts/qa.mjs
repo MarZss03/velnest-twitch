@@ -16,6 +16,7 @@ const checks=[
  ['cosmetic attachment',[resolve(dirname(require.resolve('tsx/package.json')),'dist/cli.mjs'),'apps/web/scripts/verify-cosmetics.mjs']],
  ['night lounge assets',['--test','apps/web/scripts/verify-night-room.mjs']],
  ['GPU resource cleanup',['--test','apps/web/scripts/verify-disposal.mjs']],
+ ['live render budget',['--test','apps/web/scripts/verify-render-budget.mjs']],
  ['production hosting',['--test','apps/web/scripts/verify-hosting.mjs']],
 ];
 for(const [name,args] of checks){

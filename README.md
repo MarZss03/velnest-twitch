@@ -51,7 +51,7 @@ An editable 12-second Blender/HyperFrames motion study and its verified 1080p MP
 
 ## Verify
 
-`pnpm qa` builds and checks the project, then runs all eleven automated suites
+`pnpm qa` builds and checks the project, then runs all twelve automated suites
 sequentially. GitHub Actions runs the same command on Windows and Linux without
 Twitch credentials. Browser interaction and real-account checks remain separate.
 

@@ -9,6 +9,7 @@ import { dispose3D } from './dispose3D';
 import { createRoomMotion } from './roomMotion';
 import {placeRoomLabel,type LabelBox} from './labelLayout';
 import {createNightLighting} from './nightLighting';
+import {roomPixelRatio} from './roomRenderBudget';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; labelHeight: number; cosmetic: string };
 
@@ -24,16 +25,27 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
   self.current=selfId;
   const [error, setError] = useState('');
   const [sceneryLoading,setSceneryLoading]=useState(true);
+  const [sceneVersion,setSceneVersion]=useState(0);
   useEffect(() => {
     const el = host.current;
     if (!el) return;
+    setError(''); setSceneryLoading(true);
     let renderer: THREE.WebGLRenderer;
     try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); }
     catch { setError('3D is unavailable in this browser. Enable hardware acceleration and reload.'); return; }
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    renderer.setPixelRatio(roomPixelRatio(el.clientWidth,el.clientHeight,devicePixelRatio));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     el.appendChild(renderer.domElement);
+    let contextLost=false;
+    const onContextLost=(event:Event)=>{
+      event.preventDefault(); contextLost=true;
+      renderer.domElement.style.visibility='hidden';
+      setError('The 3D view paused because graphics resources became unavailable. Reopen the view to try again.');
+    };
+    const onContextRestored=()=>setSceneVersion(version=>version+1);
+    renderer.domElement.addEventListener('webglcontextlost',onContextLost);
+    renderer.domElement.addEventListener('webglcontextrestored',onContextRestored);
     const scene = new THREE.Scene();
     const motion = createRoomMotion(scene);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -110,6 +122,7 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
       setError('Room scenery could not load. You can still move and react; reload to retry the scenery.');
     });
     const resize = new ResizeObserver(() => {
+      renderer.setPixelRatio(roomPixelRatio(el.clientWidth,el.clientHeight,devicePixelRatio));
       renderer.setSize(el.clientWidth, el.clientHeight);
       lighting.resize(el.clientWidth,el.clientHeight);
       camera.aspect = el.clientWidth / Math.max(1,el.clientHeight);
@@ -119,9 +132,10 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
     resize.observe(el);
     let last = performance.now();
     const render = (now: number) => {
+      // OBS records at 30 fps; extra GPU work only increases contention.
+      if(document.hidden || contextLost || now-last<1000/30-1) { frame=requestAnimationFrame(render); return; }
       const dt = Math.min((now-last)/1000,.05);
       last = now;
-      if(document.hidden) { frame=requestAnimationFrame(render); return; }
       const ids = new Set(people.current.map(p=>p.id));
       const player=people.current.find(person=>person.id===self.current);
       if(camera.aspect<.85 && player) {
@@ -197,11 +211,11 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
       frame=requestAnimationFrame(render);
     };
     frame=requestAnimationFrame(render);
-    return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); lighting.dispose(); draco.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
-  },[]);
+    return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); renderer.domElement.removeEventListener('webglcontextlost',onContextLost); renderer.domElement.removeEventListener('webglcontextrestored',onContextRestored); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); lighting.dispose(); draco.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
+  },[sceneVersion]);
   return <div className="room-3d" ref={host} aria-label={occupancyKnown?`3D community room with ${participants.length} participants`:'3D community room preview; occupancy unavailable'}>
     {occupancyKnown && <ul className="visually-hidden" aria-label="People inside">{participants.map(person=><li key={person.id}>{person.displayName}{person.seat?.status==='seated'?' (seated)':person.action?` (${person.action})`:''}</li>)}</ul>}
     {sceneryLoading && !error && <p className="room-loading" role="status">Preparing the night lounge…</p>}
-    {error && <p className="room-error" role="alert">{error}</p>}
+    {error && <div className="room-error" role="alert"><p>{error}</p><button type="button" onClick={()=>setSceneVersion(version=>version+1)}>Reopen 3D view</button></div>}
   </div>;
 }
