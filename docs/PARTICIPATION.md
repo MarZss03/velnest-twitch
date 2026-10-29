@@ -23,7 +23,7 @@ Official resources: https://twitchcon-codex.devpost.com/resources
 
 - repository URL with all source, assets, and setup instructions
 - English project description covering features and Codex use
-- demo video under three minutes, public or unlisted on YouTube
+- demo video under three minutes, publicly visible on YouTube (official rule rechecked October 29; the earlier unlisted option was incorrect)
 - video must show the project working on Twitch and how Codex was used
 - Codex session ID: `01a17f64-abe4-7420-ac7d-ec774258d5a8`
 

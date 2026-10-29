@@ -31,6 +31,6 @@ Official requirements: https://twitchcon-codex.devpost.com/rules. The demonstrat
 - The Codex segment shows real project work, not only a logo or title card.
 - No private credentials or unrelated personal information appear.
 - Exported video duration is below three minutes and the English explanation is legible/audible.
-- Upload to the owner's YouTube account, verify visibility and playback, and use that genuine URL in Devpost.
+- Upload to the owner's YouTube account as publicly visible, verify playback, and use that genuine URL in Devpost. The official rules require public visibility; unlisted is not the documented requirement.
 
 No YouTube URL should be inserted until that recording exists and has been checked. The Devpost project remains a draft until the owner reviews eligibility declarations and the final submission.
