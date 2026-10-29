@@ -1,5 +1,21 @@
 # Motion review
 
+## October 29 night-lounge refresh
+
+The film now uses the current compressed room, local Draco decoder and the
+website's lighting. HyperFrames check reports zero lint/runtime/layout/craft
+errors or warnings. Snapshots at 1.4, 5.6, 8.2 and 11.5 seconds show the walk,
+chair approach, seated trio and final pullback clearly.
+
+The first multi-worker export produced white WebGL frames despite reporting
+success; it was rejected after decoding. A single-worker `--low-memory-mode`
+render fixed it. The replacement is 12 seconds / 360 frames, H.264/yuv420p,
+1920×1080, 12,150,063 bytes, silent. Full FFmpeg decode passed; twelve sampled
+frames are distinct, and their decoded contact sheet was visually inspected.
+Use `node verify-render.mjs` to repeat the file checks. These new image checks
+supersede the old-room render evidence below; reverse-seek pixel equality was
+not re-measured for this refresh.
+
 Creative decision: one continuous take follows a single character into the remaining sofa seat. The shipped Blender meshes, Wave/Walk/Sit clips and shared room pathfinding carry the story. A multi-cut character montage and a UI tutorial were not used: this short piece is about joining friends, and a real Twitch walkthrough is still pending.
 
 ## Visual review and fixes

@@ -1,0 +1,28 @@
+name: VELNEST QA
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 512MiB
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/setup@v3
+        with:
+          runtime: node@22.23.2
+          require-lockfile: true
+      - run: pnpm qa

@@ -1,5 +1,16 @@
 # Public repository reproduction — October 28, 2026
 
+## October 29 follow-up
+
+The neon lounge at public revision `ef8bb8e` was independently cloned into
+`downloads/verification/velnest-night-20261029`. A frozen install reused 149
+packages from the D-drive store. Sequential typecheck/build and all three
+room/source-checksum tests passed, including byte-identical upstream glTF
+files on Windows. No private `.env` was copied or additional server started.
+The original browser walkthrough below remains evidence for the older revision;
+the newer checkout was verified at build/asset level. See the current
+[QA report](QA-2026-10-29.md) for the separate working-project checks.
+
 Verified public revision: `166a2aecb4039f50e1dbb8bfb26632c8343621ef` from https://github.com/MarZss03/velnest-twitch.
 
 A shallow clone was created under `D:\Velnest - Twitch\downloads\verification\velnest-clean-20261028`. It had no prior generated build output or project node_modules. Node.js was 22.23.2 and pnpm was 11.25.0 on Windows. Installation used `pnpm install --frozen-lockfile --store-dir D:/.pnpm-store --cache-dir D:/.pnpm-cache`; all 129 dependency packages were reused from the existing package store. This verifies a new checkout with cached dependencies, not a disconnected installation or package-registry outage.

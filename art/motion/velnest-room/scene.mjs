@@ -1,5 +1,7 @@
 import * as THREE from '../../../apps/web/node_modules/three/build/three.module.js';
 import {GLTFLoader} from '../../../apps/web/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {DRACOLoader} from '../../../apps/web/node_modules/three/examples/jsm/loaders/DRACOLoader.js';
+import {createNightLighting} from '../../../apps/web/src/nightLighting.ts';
 import {findRoomPath,fromWorld,toWorld} from '../../../packages/shared/src/room.ts';
 
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
@@ -26,12 +28,15 @@ function pose(actor,name,time,previous,weight=1){
 export async function build(canvas){
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
   renderer.setSize(1920,810,false);renderer.setPixelRatio(1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
-  const scene=new THREE.Scene();scene.background=new THREE.Color('#252127');
-  scene.add(new THREE.HemisphereLight(0xfff4e7,0x524261,2.5));
-  const light=new THREE.DirectionalLight(0xffdfb0,3);light.position.set(-3,8,4);light.castShadow=true;
-  light.shadow.mapSize.set(1024,1024);light.shadow.camera.left=light.shadow.camera.bottom=-7;light.shadow.camera.right=light.shadow.camera.top=7;light.shadow.normalBias=.035;light.shadow.bias=-.00015;scene.add(light);
+  const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(38,1920/810,.1,60),loader=new GLTFLoader();
-  const [room,...characters]=await Promise.all(['afterparty','riff','arc','muse'].map(name=>loader.loadAsync(`assets/models/${name}.glb`)));
+  const lighting=createNightLighting(renderer,scene,camera);lighting.resize(1920,810);
+  const draco=new DRACOLoader().setDecoderPath('assets/vendor/draco/').setWorkerLimit(1);
+  loader.setDRACOLoader(draco);
+  let assets;
+  try { assets=await Promise.all(['afterparty','riff','arc','muse'].map(name=>loader.loadAsync(`assets/models/${name}.glb`))); }
+  finally { draco.dispose(); }
+  const [room,...characters]=assets;
   room.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room.scene);
   const actors=characters.map(g=>{g.scene.traverse(o=>{if(o.isMesh)o.castShadow=true;});scene.add(g.scene);return {model:g.scene,mixer:new THREE.AnimationMixer(g.scene),clips:g.animations};});
   actors[1].model.position.set(-2.65,.02,-1.52);actors[2].model.position.set(-1.35,.02,-1.52);
@@ -49,7 +54,7 @@ export async function build(canvas){
     const distance=mix(5.8,6.5,opening),focal=5.8*Math.tan(38*Math.PI/360);
     camera.fov=mix(2*Math.atan(focal/distance)*180/Math.PI,38,travel);
     camera.position.set(mix(mix(.8,-1.4,travel),-.4,reveal),mix(mix(3.9,2.8,travel),3.5,reveal),mix(mix(distance,2,travel),3.4,reveal));
-    camera.lookAt(mix(mix(-.5,-2,travel),-1.7,reveal),mix(mix(.4,.6,travel),.45,reveal),mix(mix(.1,-1.52,travel),-1.1,reveal));camera.updateProjectionMatrix();scene.updateMatrixWorld(true);renderer.render(scene,camera);
+    camera.lookAt(mix(mix(-.5,-2,travel),-1.7,reveal),mix(mix(.4,.6,travel),.45,reveal),mix(mix(.1,-1.52,travel),-1.1,reveal));camera.updateProjectionMatrix();scene.updateMatrixWorld(true);lighting.render();
   }
   renderAt(0);return {renderAt};
 }

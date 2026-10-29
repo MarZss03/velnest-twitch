@@ -12,7 +12,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - keyboard and touch controls;
 - a clean OBS overlay view;
 - event-driven 3D arrival, destination and reaction effects;
-- three reservable sofa seats with walk-to-seat, Blender-authored sitting and standing transitions;
+- three reservable lounge chairs with walk-to-seat, Blender-authored sitting and standing transitions;
 - server-side Twitch OAuth, verified viewer identities and expiring sessions; optional subscriber-only admission for affiliate/partner channels.
 - broadcaster-only removal with a five-minute identity timeout.
 - a 24-character admission limit, with full-room spectating and automatic entry availability when a place opens.
@@ -51,6 +51,10 @@ An editable 12-second Blender/HyperFrames motion study and its verified 1080p MP
 
 ## Verify
 
+`pnpm qa` builds and checks the project, then runs all eleven automated suites
+sequentially. GitHub Actions runs the same command on Windows and Linux without
+Twitch credentials. Browser interaction and real-account checks remain separate.
+
 ```powershell
 pnpm typecheck
 pnpm build
@@ -64,6 +68,7 @@ pnpm test:labels
 pnpm test:cosmetics
 pnpm test:hosting
 pnpm test:night-room
+pnpm test:disposal
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.

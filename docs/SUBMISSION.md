@@ -1,6 +1,6 @@
 # VELNEST submission copy
 
-Draft prepared October 28, 2026. Live Twitch broadcaster authorization and OBS synchronization are verified; the required Twitch broadcast and YouTube demonstration are not yet complete. Do not treat this document as a submitted entry.
+Draft updated October 29, 2026. Live Twitch broadcaster authorization and OBS synchronization are verified; the required Twitch broadcast and YouTube demonstration are not yet complete. Do not treat this document as a submitted entry.
 
 ## Project name
 
@@ -18,7 +18,9 @@ A Twitch community has familiar names, recurring jokes and shared moments. VELNE
 
 ### What it does
 
-Signed-in viewers choose one of three simple humanoid characters, Riff, Arc or Muse, and add headphones, a backpack or a lightstick. They can walk around furniture, wave, cheer, dance and reserve a sofa cushion. Reactions combine authored character animation with brief floor rings and confetti. The streamer displays the same room through an OBS Browser Source.
+Signed-in viewers choose one of three simple humanoid characters, Riff, Arc or Muse, and add headphones, a backpack or a lightstick. They can walk around furniture, wave, cheer, dance and reserve a lounge chair. Reactions combine authored character animation with brief floor rings and confetti. The streamer displays the same room through an OBS Browser Source.
+
+The dark esports lounge combines violet/cyan neon, leather seating, plants and gaming equipment. Four CC0 furniture sources from Poly Haven have recorded licenses and checksums. Codex-authored Blender scripts assemble the editable set; the browser uses a 2.38 MB compressed model, self-hosted decoders, material reflections and restrained bloom.
 
 The room server owns movement, reactions and seat reservations. A broadcaster can remove a participant for five minutes; the timeout follows the verified Twitch identity across tabs, reconnects and fresh logins. Other viewers can continue watching.
 

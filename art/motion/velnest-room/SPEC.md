@@ -2,8 +2,8 @@
 
 GOAL: Show a recognizable character joining friends in the lounge using shipped Blender models and poses.
 OUTPUT: HyperFrames, 1920×1080, 30 fps, 12 seconds / 360 frames. Silent motion study; no narration or claim of a live Twitch session.
-LOOK: Actual Afterparty GLB in a 1920×810 full-width image, with a 270px charcoal typography rail below it. Warm key #ffdfb0, hemisphere #fff4e7/#524261, environment #252127. Local Manrope 800; opening 96px, payoff 82px, wordmark 112px, tracking -.035em. No bloom, grain or added particles. Main text sits between y838–960 and x144–1776, away from the authored room signage.
-OBJECTS: Riff, Arc, Muse, sofa, coffee table, mugs, plants, stage and wall display from the current web product.
+LOOK: Current neon Afterparty GLB in a 1920×810 full-width image, with a 270px charcoal typography rail below it. Lighting is shared with the website: ACES exposure .85, environment intensity .25, violet/cyan fills and bloom strength .16 / radius .23 / threshold 1.7. Local Manrope 800; opening 96px, payoff 82px, wordmark 112px, tracking -.035em. No grain or added particles. Main text sits between y838–960 and x144–1776, away from the authored room signage.
+OBJECTS: Riff, Arc, Muse, three CC0 leather chairs, coffee table, mugs, plants, stage and gaming desk from the current web product.
 MOTION: One continuous take. Opening compensates a 12% dolly with field of view, adapting the registry camera-dolly-zoom invariant. Riff waves, walks along the shared collision-free path, pauses .4s, then crossfades to Sit over .4s. Camera travels toward the sofa and pulls back. Every frame derives from timeline time; no animation clock, random values or endless loops.
 SHOTS:
 - f0–83: Riff waves with friends behind. Read "Your seat's waiting" from f9–83.

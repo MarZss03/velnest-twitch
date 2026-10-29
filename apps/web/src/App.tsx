@@ -361,7 +361,7 @@ export function App() {
             <p>Click the floor to walk around furniture. Use WASD, arrow keys, or hold the controls below to take over.</p>
             <Dpad onMove={(direction) => socket.emit("move", direction)} />
             <ActionBar disabled={Boolean(selfParticipant?.seat)} active={selfParticipant?.action??null} onAction={(actionId) => socket.emit("performAction", actionId)} />
-            <div className="seat-controls" aria-label="Sofa seats">
+            <div className="seat-controls" aria-label="Lounge chairs">
               <span className="seat-heading">Take a seat</span>
               <div className="seat-options">{SEATS.map((seat,index)=>{
                 const occupant=participants.find(person=>person.seat?.id===seat.id);
@@ -370,7 +370,7 @@ export function App() {
                   {['Left','Middle','Right'][index]}<small>{mine?'Yours':occupant?'Taken':'Available'}</small>
                 </button>;
               })}</div>
-              {selfParticipant?.seat ? <button className="stand-button" type="button" onClick={()=>{setInteractionMessage('');socket.emit('stand');showWorld();}}>{selfParticipant.seat.status==='seated'?'Stand up':'Cancel walk to seat'}</button> : <p>Click a cushion or choose a seat above.</p>}
+              {selfParticipant?.seat ? <button className="stand-button" type="button" onClick={()=>{setInteractionMessage('');socket.emit('stand');showWorld();}}>{selfParticipant.seat.status==='seated'?'Stand up':'Cancel walk to seat'}</button> : <p>Click a chair or choose a seat above.</p>}
               <p className="seat-status" role="status">{interactionMessage || (selfParticipant?.seat?.status==='approaching'?'Walking to your seat…':selfParticipant?.seat?.status==='seated'?'Make yourself at home. Stand up to react.':'')}</p>
             </div>
             <label className="cosmetic-picker">

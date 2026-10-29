@@ -8,7 +8,11 @@
   "codec": "h264",
   "pixelFormat": "yuv420p",
   "audioStreams": 0,
-  "bytes": 6188227,
+  "bytes": 12150063,
+  "sha256": "78a7de5229194a45209945e2f60e99cc7f3eedc1243c07edba6b514df45ef5a5",
   "decodedSamples": 12,
-  "uniqueSampleFrames": 12
+  "uniqueSampleFrames": 12,
+  "scene": "neon-night-lounge",
+  "capture": "single-worker low-memory screenshot",
+  "visualInspection": "Review renders/contact-sheet.jpg separately; metadata does not prove image correctness."
 }
