@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VELNEST — Local art review</title>
+<style>body{margin:0;background:#090d18;color:#eee;font-family:Manrope,system-ui}header{padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;height:auto}header p{margin:0 auto 0 0;font-size:13px;color:#b7c2d5}button{background:#23283b;color:#eee;border:1px solid #46506b;padding:10px 14px;border-radius:6px;cursor:pointer}button:focus-visible{outline:3px solid #b99af5}#stage{position:relative;height:calc(100vh - 92px);min-height:440px}.room-3d{height:100%}</style></head>
+<body><div id="root"></div><script type="module">
+import React,{useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import {Room3D} from '../src/Room3D.tsx';
+import {SEATS,fromWorld,canOccupy} from '@velnest/shared';
+import '../src/styles.css';
+const h=React.createElement;
+const samples=()=>[
+ {id:'review-riff',displayName:'Riff · sample',avatarId:'riff',...SEATS[0].position,cosmetic:'headphones',action:null,actionNonce:0,seat:{id:SEATS[0].id,status:'seated'}},
+ {id:'review-arc',displayName:'Arc · sample',avatarId:'arc',...fromWorld(2,-1.55),cosmetic:'lightstick',action:'dance',actionNonce:1,seat:null},
+ {id:'review-muse',displayName:'Muse · sample',avatarId:'muse',...fromWorld(.25,.9),cosmetic:'backpack',action:'wave',actionNonce:1,seat:null},
+];
+function Review(){
+ const [people,setPeople]=useState(samples);
+ const update=values=>setPeople(old=>old.map((p,i)=>i===0?{...p,...values,actionNonce:p.actionNonce+1}:p));
+ const crowd=()=>{
+  const grid=[];for(let y=25;y<=85;y+=15)for(let x=10;x<=90;x+=12)if(canOccupy(x,y))grid.push({x,y});
+  setPeople(grid.slice(0,24).map((position,i)=>({id:'crowd-'+i,displayName:'Sample '+(i+1),avatarId:['riff','arc','muse'][i%3],...position,cosmetic:'none',action:null,actionNonce:0,seat:null})));
+ };
+ return h(React.Fragment,null,h('header',null,h('p',null,'LOCAL ART REVIEW · Simulated participants · No Twitch session'),
+  h('button',{onClick:()=>setPeople(samples())},'Three characters'),h('button',{onClick:crowd},'24 characters'),
+  h('button',{onClick:()=>update({...SEATS[1].position,seat:{id:SEATS[1].id,status:'seated'},action:null})},'Sit'),
+  h('button',{onClick:()=>update({...fromWorld(-.2,1.1),seat:null,action:'dance'})},'Dance')),
+  h('main',{id:'stage'},h(Room3D,{participants:people,onNavigate:position=>update({...position,seat:null,action:null}),onSit:id=>{const seat=SEATS.find(s=>s.id===id);if(seat)update({...seat.position,seat:{id,status:'seated'},action:null});}})));
+}
+if(import.meta.env.DEV)createRoot(document.getElementById('root')).render(h(Review));
+</script></body></html>

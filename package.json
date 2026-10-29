@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "scripts": {
+    "test:night-room": "node --test apps/web/scripts/verify-night-room.mjs",
     "start": "node apps/server/dist/index.js --serve-web",
     "test:hosting": "pnpm build && node --test apps/web/scripts/verify-hosting.mjs",
     "test:cosmetics": "pnpm --filter @velnest/server exec tsx ../web/scripts/verify-cosmetics.mjs",

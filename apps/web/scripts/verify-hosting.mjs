@@ -29,6 +29,8 @@ test('compiled frontend, models, fonts and API share a host without exposing sou
     assert.equal(response.headers['cache-control'],'no-cache');
   }
   const font=await app.inject('/fonts/manrope-latin.woff2');assert.equal(font.statusCode,200);assert.match(font.headers['content-type'],/font\/woff2/);
+  const decoder=await app.inject('/vendor/draco/draco_decoder.wasm');assert.equal(decoder.statusCode,200);assert.match(decoder.headers['content-type'],/application\/wasm/);
+  assert.equal((await app.inject('/dev/room-review.html')).statusCode,404,'art fixture is not shipped');
   for(const url of ['/.env','/README.md','/apps/server/src/twitchAuth.ts','/%2e%2e%2f%2e%2e%2f.env','/assets/not-real.js']){
     const response=await app.inject(url);assert.ok([400,403,404].includes(response.statusCode));
     assert.doesNotMatch(response.body,/TWITCH_CLIENT_SECRET|test-secret/);

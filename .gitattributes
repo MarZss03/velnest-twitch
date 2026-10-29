@@ -1,0 +1,2 @@
+# Preserve upstream bytes so source checksum verification survives Windows checkouts.
+art/vendor/polyhaven/**/*.gltf -text

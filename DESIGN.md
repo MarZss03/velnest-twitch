@@ -4,7 +4,7 @@ The primary surface is the community room itself. The page should help a Twitch 
 
 ## Material and hierarchy
 
-- Neutral charcoal page, opaque panels, lavender primary action, warm low-poly furniture, sage accessories.
+- Neutral charcoal page, opaque panels, lavender primary action and sage character accessories. The owner replaced the first simple room with an esports night lounge: graphite floor, dark acoustic walls, walnut fins, genuine CC0 leather furniture and violet/cyan neon. Static layered lighting and restrained HDR bloom preserve material detail. See docs/NIGHT-LOUNGE.md for sources, budgets and scoped verification.
 - Manrope is the interface face. Keep code styling confined to the OBS source URL.
 - The shared 3D room leads the desktop composition; the selector occupies a quieter right rail. On phones these stack and the joined camera follows the local player.
 - Use the actual Blender model renders for character cards. Concept art remains production reference rather than a substitute for the shipped model.

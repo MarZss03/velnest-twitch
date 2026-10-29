@@ -1,0 +1,27 @@
+{
+  "theme": "esports night lounge",
+  "source_assets": [
+    "modern_arm_chair_01",
+    "modern_coffee_table_02",
+    "desk_lamp_arm_01",
+    "potted_plant_02"
+  ],
+  "triangles": 160397,
+  "materials": 20,
+  "bytes": 2381552,
+  "seat_centers_blender": [
+    [
+      -2.65,
+      1.52
+    ],
+    [
+      -2,
+      1.52
+    ],
+    [
+      -1.35,
+      1.52
+    ]
+  ],
+  "source": "art/vendor/polyhaven/*/source.json"
+}

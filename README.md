@@ -7,6 +7,7 @@ VELNEST is an interactive world for Twitch communities. All signed-in Twitch vie
 The default local build uses clearly marked demo identity. The room includes:
 
 - three Blender-built, animated humanoid avatars with interchangeable accessories;
+- a neon esports lounge with genuine CC0 leather furniture, plants, gaming equipment and layered lighting; see [room sources and verification](docs/NIGHT-LOUNGE.md);
 - real-time shared movement across browser tabs/devices;
 - keyboard and touch controls;
 - a clean OBS overlay view;
@@ -62,6 +63,7 @@ pnpm test:capacity
 pnpm test:labels
 pnpm test:cosmetics
 pnpm test:hosting
+pnpm test:night-room
 ```
 
 `test:auth` exercises the real HTTP routes and Socket.IO room against a simulated Twitch provider. It does not use a real Twitch account.

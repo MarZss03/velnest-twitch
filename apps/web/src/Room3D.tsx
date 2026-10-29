@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { AVATARS, SEATS, canOccupy, floorHeight, fromWorld, type Participant, type SeatId } from '@velnest/shared';
 import { attachCosmetic } from './cosmetics';
 import { createAnimator } from './animation';
 import { dispose3D } from './dispose3D';
 import { createRoomMotion } from './roomMotion';
 import {placeRoomLabel,type LabelBox} from './labelLayout';
+import {createNightLighting} from './nightLighting';
 
 type Actor = { model: THREE.Group; mixer: THREE.AnimationMixer; animate: (name:string,reduced?:boolean)=>void; target: THREE.Vector3; action: string; nonce: number; label: HTMLSpanElement; labelWidth: number; labelHeight: number; cosmetic: string };
 
@@ -21,6 +23,7 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
   const self=useRef(selfId);
   self.current=selfId;
   const [error, setError] = useState('');
+  const [sceneryLoading,setSceneryLoading]=useState(true);
   useEffect(() => {
     const el = host.current;
     if (!el) return;
@@ -34,20 +37,10 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
     const scene = new THREE.Scene();
     const motion = createRoomMotion(scene);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    scene.background = new THREE.Color('#252127');
     const camera = new THREE.PerspectiveCamera(38, 1, .1, 60);
-    camera.position.set(0, 7, 10);
-    camera.lookAt(0, 0, 0);
-    scene.add(new THREE.HemisphereLight(0xfff4e7, 0x524261, 2.5));
-    const key = new THREE.DirectionalLight(0xffdfb0, 3);
-    key.position.set(-3, 8, 4);
-    key.castShadow = true;
-    key.shadow.camera.left = key.shadow.camera.bottom = -7;
-    key.shadow.camera.right = key.shadow.camera.top = 7;
-    key.shadow.mapSize.set(1024,1024);
-    key.shadow.normalBias=.035;
-    key.shadow.bias=-.00015;
-    scene.add(key);
+    camera.position.set(0, 7.2, 10.8);
+    camera.lookAt(0, .65, -.35);
+    const lighting=createNightLighting(renderer,scene,camera);
     const raycaster=new THREE.Raycaster();
     const ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
     const point=new THREE.Vector3();
@@ -81,24 +74,27 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
       mesh.castShadow = true;
       scene.add(mesh);
     };
-    box('Floor',[10,.2,7],[0,-.15,0],'#4a4052');
-    box('Back wall',[10,2,.2],[0,.8,-3.5],'#332d39');
-    box('Sofa seat',[2.7,.35,.85],[-2,.25,-1.8],'#8e70ad');
-    box('Sofa back',[2.7,.65,.2],[-2,.65,-2.2],'#8e70ad');
-    box('Stage',[2.4,.25,1.7],[2,.05,-1.8],'#796583');
-    box('Screen',[1.8,1,.12],[2,1.25,-3.32],'#bca0e3');
-    box('Table',[1.2,.12,.7],[-1.5,.5,.1],'#d7b68d');
-    box('Table leg',[.15,.5,.15],[-1.5,.2,.1],'#d7b68d');
+    box('Floor',[10,.2,7],[0,-.15,0],'#171f32');
+    box('Back wall',[10,2,.2],[0,.8,-3.5],'#0d1424');
+    box('Sofa seat',[2.7,.35,.85],[-2,.25,-1.8],'#272638');
+    box('Sofa back',[2.7,.65,.2],[-2,.65,-2.2],'#272638');
+    box('Stage',[2.4,.25,1.7],[2,.05,-1.8],'#1b2333');
+    box('Screen',[1.8,1,.12],[2,1.25,-3.32],'#282c45');
+    box('Table',[1.2,.12,.7],[-1.5,.5,.1],'#3f3341');
+    box('Table leg',[.15,.5,.15],[-1.5,.2,.1],'#171f32');
     const actors = new Map<string,Actor>();
     const onMotionPreference=()=>actors.forEach(actor=>{ actor.action=''; });
     reduced.addEventListener('change',onMotionPreference);
     const pending = new Set<string>();
     const failed = new Set<string>();
     const loader = new GLTFLoader();
+    const draco=new DRACOLoader().setDecoderPath('/vendor/draco/').setWorkerLimit(1);
+    loader.setDRACOLoader(draco);
     let disposed = false;
     let frame = 0;
     const disposeModel = dispose3D;
-    loader.load('/models/afterparty.glb', gltf => {
+    loader.load('/models/afterparty.glb?v=night-lounge-1', gltf => {
+      draco.dispose(); // The room is the only compressed asset; release its worker.
       if(disposed) { disposeModel(gltf.scene); return; }
       for(const name of ['Floor','Back wall','Sofa seat','Sofa back','Stage','Screen','Table','Table leg']) {
         const fallback=scene.getObjectByName(name);
@@ -106,9 +102,16 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
       }
       gltf.scene.traverse(obj=>{if(obj instanceof THREE.Mesh){obj.receiveShadow=true;obj.castShadow=true;}});
       scene.add(gltf.scene);
-    },undefined,()=>{ /* The basic room remains usable when environment loading fails. */ });
+      setSceneryLoading(false);
+    },undefined,()=>{
+      draco.dispose();
+      if(disposed)return;
+      setSceneryLoading(false);
+      setError('Room scenery could not load. You can still move and react; reload to retry the scenery.');
+    });
     const resize = new ResizeObserver(() => {
       renderer.setSize(el.clientWidth, el.clientHeight);
+      lighting.resize(el.clientWidth,el.clientHeight);
       camera.aspect = el.clientWidth / Math.max(1,el.clientHeight);
       camera.position.z = camera.aspect < 1 ? 16 : 10;
       camera.updateProjectionMatrix();
@@ -126,8 +129,8 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
         camera.position.set(x,4,z+5.6);
         camera.lookAt(x,.35,z-.45);
       } else {
-        camera.position.set(0,7,camera.aspect<1?16:10);
-        camera.lookAt(0,0,0);
+        camera.position.set(0,7.2,camera.aspect<1?16:10.8);
+        camera.lookAt(0,.65,-.35);
       }
       actors.forEach((actor,id) => { if (!ids.has(id)) { scene.remove(actor.model); actor.mixer.stopAllAction(); disposeModel(actor.model); actor.label.remove(); actors.delete(id); } });
       const placedLabels:LabelBox[]=[];
@@ -190,14 +193,15 @@ export function Room3D({ participants, occupancyKnown=true, onNavigate, onSit, s
         }
       }
       motion.update(dt,reduced.matches);
-      renderer.render(scene,camera);
+      lighting.render();
       frame=requestAnimationFrame(render);
     };
     frame=requestAnimationFrame(render);
-    return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { disposed=true; reduced.removeEventListener('change',onMotionPreference); renderer.domElement.removeEventListener('click',onClick); cancelAnimationFrame(frame); resize.disconnect(); actors.forEach(a=>{a.label.remove();a.mixer.stopAllAction();}); motion.dispose(); lighting.dispose(); draco.dispose(); disposeModel(scene); renderer.dispose(); renderer.domElement.remove(); };
   },[]);
   return <div className="room-3d" ref={host} aria-label={occupancyKnown?`3D community room with ${participants.length} participants`:'3D community room preview; occupancy unavailable'}>
     {occupancyKnown && <ul className="visually-hidden" aria-label="People inside">{participants.map(person=><li key={person.id}>{person.displayName}{person.seat?.status==='seated'?' (seated)':person.action?` (${person.action})`:''}</li>)}</ul>}
+    {sceneryLoading && !error && <p className="room-loading" role="status">Preparing the night lounge…</p>}
     {error && <p className="room-error" role="alert">{error}</p>}
   </div>;
 }
