@@ -40,7 +40,7 @@ Separating the initial interface from the 3D renderer, self-hosting fonts and ma
 
 ### Current status and next steps
 
-The public repository offers an explicitly labeled demo mode. The real Twitch authorization-code flow has also completed for the broadcaster account, and entry, reactions, accessory changes and sofa seating synchronized into the actual OBS Browser Source. A local rehearsal was recorded. Automated tests additionally exercise viewer admission and moderation against a simulated provider. A second real viewer account and the actual Twitch broadcast walkthrough remain to be verified; local OBS footage is not claimed as a Twitch broadcast.
+The public repository offers an explicitly labeled demo mode. The broadcaster completed real Twitch authorization and demonstrated character entry, accessory changes, movement, reactions and lounge seating through OBS. An authorized public demonstration ran on meemokiller on October 29, 2026; the Twitch player visibly received the room and its live title. A 188-second local recording of that broadcast was saved and decoded successfully. All twelve QA suites pass locally and on Windows/Linux CI. Viewer admission and moderation also have simulated-provider coverage. A second real viewer account and a physical-phone walkthrough remain unverified.
 
 ## Built with
 
@@ -56,7 +56,7 @@ https://github.com/MarZss03/velnest-twitch
 
 ## Technology requirement
 
-OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and Get Users, with no additional scopes required for open viewer admission. Live broadcaster authorization and room interaction synchronized to the actual OBS Browser Source have been verified and locally recorded. The required Twitch broadcast demonstration remains pending; viewer admission and moderation also have simulated-provider test coverage.
+OpenAI Codex was used to build and revise the TypeScript application, React interface, Three.js renderer, Fastify/Socket.IO realtime server, Blender Python asset pipeline and automated verification. Blender supplies the editable 3D lounge, humanoid characters, modular props and animation clips. HyperFrames supplies a separate editable motion study. Twitch authorization uses server-side OAuth, token validation and Get Users, with no additional scopes required for open viewer admission. Live broadcaster authorization and room interaction synchronized to the actual OBS Browser Source have been verified and locally recorded. An authorized public Twitch demonstration was completed on October 29, 2026, with the room verified in the actual Twitch player; viewer admission and moderation also have simulated-provider test coverage.
 
 ## Streamer and community use
 

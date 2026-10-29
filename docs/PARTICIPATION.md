@@ -75,3 +75,14 @@ The 100–120-second English recording plan is in DEMO-RUNBOOK.md. It requires a
 
 Use a browser-based overlay and Twitch OAuth/API path. Do not build a Twitch Extension for this deadline: the official FAQ warns Extension review can take 5–14 days, while overlays, API, chat, and EventSub are faster.
 
+
+## Public demonstration completed — October 29
+
+The owner explicitly approved a short public demonstration on meemokiller.
+The stream title was VELNEST | Codex x TwitchCon Hackathon — live project demo,
+category Software and Game Development, with microphone and desktop audio muted.
+The real Twitch player received the room. Both stream and local recording were
+stopped after approximately three minutes. The local broadcast recording is
+188.13 seconds; the edited English demonstration is being verified before upload.
+YouTube Studio is signed in as Kapy Ai. Upload requires explicit acceptance of
+YouTube terms in the displayed dialog. No video has been uploaded yet.
