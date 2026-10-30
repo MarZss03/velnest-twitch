@@ -26,6 +26,9 @@ const files=[
  ['docs/FINAL-SUBMISSION.md','final-submission.md'],
  ['docs/RULES-AUDIT-2026-10-30.md','rules-audit.md'],
  ['docs/VIDEO-CREDITS.md','video-credits.md'],
+ ['downloads/final-demo/devpost-submitted.png','08-entry-receipt.png'],
+ ['downloads/final-demo/youtube-final-under-three-minutes.png','09-public-video-proof.png'],
+ ['downloads/final-demo/submission-receipt.json','submission-receipt.json'],
  ['art/vendor/polyhaven/LICENSE.md','furniture-credits.md'],
 ];
 for(const [source,name] of files)await cp(resolve(root,source),resolve(out,name));

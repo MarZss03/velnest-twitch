@@ -6,7 +6,8 @@
 - Public YouTube URL: https://www.youtube.com/watch?v=8-6oXTWjfto
 - Channel: Kapy Ai
 - Owner-selected final file: `downloads/final-demo/VELNEST-demo-3min-preview-720p.mp4`
-- Duration: 180.000 seconds; H.264, 1280×720, 30 fps, AAC.
+- Uploaded source duration: 180.000 seconds; H.264, 1280×720, 30 fps, AAC.
+- Final public playback duration after the approved in-place trim: **178.101 seconds (2:58)**.
 - File size: 8,505,744 bytes.
 - SHA-256: `d15715922463b87ca94b9394ac28b4567c83d4f0ab8f5bb96e796bb91a2cf7a0`
 
@@ -31,15 +32,26 @@ prepared at `downloads/final-demo/VELNEST-demo-submission-179s-720p.mp4`.
 SHA-256: `ddb6bfc137851f43d42ee741dbdd0ab0911a0c743bc9d58498b27c0c067b80f7`.
 It preserves the video stream and fades the closing audio; the original remains.
 
-The preferred publication fix is now an in-place YouTube Studio trim, preserving
-the genuine video URL. A preview ending at approximately 2:58 is prepared but
-not saved. The public video remains the original 3-minute version until the
-owner confirms this irreversible edit and processing completes.
+The owner explicitly confirmed the irreversible in-place YouTube trim and final
+contest agreement. The trim was saved, processing completed, and the public watch
+page played successfully with a measured duration of 178.101 seconds and visible
+2:58 label. The genuine video URL is unchanged. Publication credits acknowledge
+the furniture, sound effects, synthesized narration, fonts and OpenAI/Codex marks.
 
 ## Submission state
 
-Project details and additional answers are saved, including the genuine public
-YouTube URL, source and Codex session ID. Devpost shows 4/5 complete. Its public
-preview displays the correct embedded video and project story. The final
-Devpost agreement and Submit project action have not yet been performed.
-An uploaded video or saved draft must not be described as a submitted entry.
+**SUBMITTED on October 30, 2026 (America/New_York).** After the owner confirmed
+the official rules and Devpost terms, the final checkbox was selected and Submit
+project clicked. The My hackathon projects page then displayed **Submitted** on
+the VELNEST project card. Submission ID: `1268408`.
+
+Project details and additional answers are saved, including the public video,
+source, Codex session ID, description, gallery captions and personal declarations.
+The public project preview displayed the correct video and story before submission.
+
+Local receipt: `downloads/final-demo/submission-receipt.json`.
+Screenshot: `downloads/final-demo/devpost-submitted.png`.
+Video proof: `downloads/final-demo/youtube-final-under-three-minutes.png`.
+
+No required submission action remains. This receipt establishes entry receipt,
+not organizer preapproval, final eligibility determination or a prize award.

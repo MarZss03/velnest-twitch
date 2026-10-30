@@ -1,6 +1,6 @@
 # VELNEST submission copy
 
-Draft updated October 30, 2026. Real Twitch broadcaster authorization, OBS synchronization and the public Twitch demonstration are verified. A video is public on YouTube; a shorter, 179-second submission copy is prepared after the rules audit. Devpost final agreement and submission remain pending. See FINAL-SUBMISSION.md for the current video and entry status.
+Submitted October 30, 2026. Real Twitch authorization, OBS synchronization and the public Twitch demonstration are verified. The YouTube demonstration is public and plays at 2:58. The owner confirmed the final agreement, and Devpost My projects displays Submitted. See FINAL-SUBMISSION.md for the receipt.
 
 ## Project name
 
@@ -62,6 +62,6 @@ OpenAI Codex was used to build and revise the TypeScript application, React inte
 
 The streamer opens the room's OBS Browser Source and shares the controller link. Any viewer signs in with Twitch, chooses a character and accessory, then moves, reacts or sits with the community; no channel subscription is required. The shared room appears in the broadcast. The broadcaster can manage participants without entering an avatar and can impose a five-minute room timeout. Anonymous viewers can watch. A separate labeled demo mode lets judges inspect the shared interactions without supplying Twitch credentials.
 
-## Still needed from the owner
+## Submission result
 
-Personal answers and eligibility declarations, project description, gallery, source URL and Codex session ID are saved. The genuine YouTube URL is embedded in the project. Remaining: confirm publication of the 179-second submission copy, replace the embedded URL, and accept the final official-rules/Devpost agreement before clicking Submit project. No draft is described as submitted.
+Personal answers and eligibility declarations, project description, gallery, source URL and Codex session ID are saved. The public YouTube URL is embedded in the project: https://www.youtube.com/watch?v=8-6oXTWjfto . The owner-approved trim and final agreement are complete. Devpost confirms Submitted for VELNEST, entry 1268408. No required owner action remains for submitting this entry.

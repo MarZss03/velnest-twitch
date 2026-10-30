@@ -2,7 +2,7 @@
 
 Last project QA: **2026-10-29 (America/New_York)**. Latest account/form inspection: **2026-10-30**.
 
-Current state: the authorized public Twitch demonstration is complete. YouTube video `8-6oXTWjfto` is public and plays. Devpost project details and additional answers are saved, including the real video link, source and Codex session ID. The form shows **4/5**; final agreement/submission has not been clicked. A rules audit prepared an in-place trim to make the video strictly less than three minutes. See [current submission record](FINAL-SUBMISSION.md) and [rules audit](RULES-AUDIT-2026-10-30.md).
+Current state: **SUBMITTED on October 30, 2026.** The authorized public Twitch demonstration is complete. YouTube video `8-6oXTWjfto` is public and plays at 2:58 after the owner-approved trim. Project details, additional answers and the final agreement are saved. The Devpost My projects card displays Submitted. See [submission receipt](FINAL-SUBMISSION.md) and [rules audit](RULES-AUDIT-2026-10-30.md).
 
 The complete twelve-suite QA passes locally and on Windows/Linux CI; see the [QA report](QA-2026-10-29.md). Older dated notes below describe earlier stages and are retained as history, not current blockers.
 
