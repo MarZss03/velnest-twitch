@@ -22,7 +22,10 @@ const files=[
  ['docs/DEMO-RUNBOOK.md','recording-runbook.md'],
  ['docs/QA-2026-10-29.md','qa-report.md'],
  ['docs/DEMO-DELIVERY.md','demo-evidence.md'],
- ['downloads/final-demo/VELNEST-demo.mp4','07-final-demonstration.mp4'],
+ ['downloads/final-demo/VELNEST-demo-submission-179s-720p.mp4','07-final-demonstration.mp4'],
+ ['docs/FINAL-SUBMISSION.md','final-submission.md'],
+ ['docs/RULES-AUDIT-2026-10-30.md','rules-audit.md'],
+ ['docs/VIDEO-CREDITS.md','video-credits.md'],
  ['art/vendor/polyhaven/LICENSE.md','furniture-credits.md'],
 ];
 for(const [source,name] of files)await cp(resolve(root,source),resolve(out,name));
@@ -33,5 +36,5 @@ for(const name of [...files.map(([,name])=>name),'velnest-source.zip']){
  hashes.push({file:name,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});
 }
 await writeFile(resolve(out,'manifest.json'),JSON.stringify({revision,created:date,files:hashes},null,2)+'\n');
-await writeFile(resolve(out,'START-HERE.md'),`# VELNEST review package\n\nSource revision: ${revision}\nRepository: https://github.com/MarZss03/velnest-twitch\n\n01 is an offline Blender room render. 02 and 04 show the running website.\n03 explicitly shows simulated characters for art review. 05 shows the local OBS Browser Source.\n06 is a staged, silent 12-second motion study, not Twitch broadcast footage.\n07 is the verified 103-second English demonstration, including actual broadcast evidence.\n\nThe English project story, recording runbook, demo evidence and QA report are included.\nThe source ZIP contains only committed files; credentials and raw private recordings are excluded.\nFile hashes are in manifest.json.\n\nThe authorized public Twitch demonstration is complete. Devpost cover and gallery\nfiles were uploaded. Still pending: public YouTube upload, its genuine video URL,\nsaving project details, and final entry review and submission.\n`);
+await writeFile(resolve(out,'START-HERE.md'),`# VELNEST review package\n\nSource revision: ${revision}\nRepository: https://github.com/MarZss03/velnest-twitch\n\n01 is an offline Blender room render. 02 and 04 show the running website.\n03 explicitly shows simulated characters for art review. 05 shows the local OBS Browser Source.\n06 is a staged, silent 12-second motion study, not Twitch broadcast footage.\n07 is the verified 179-second local submission copy, including actual broadcast evidence.\n\nThe English project story, recording runbook, demo evidence and QA report are included.\nThe source ZIP contains only committed files; credentials and raw private recordings are excluded.\nFile hashes are in manifest.json.\n\nThe authorized public Twitch demonstration is complete. Devpost cover and gallery\nfiles and project details are saved. The public video URL is in final-submission.md.\nFinal duration correction and Devpost agreement/submission status are recorded there.\n`);
 console.log(`Review package saved: ${out}\nSource: ${revision}\n${hashes.length} checksummed files; no upload performed.`);

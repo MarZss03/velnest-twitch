@@ -1,6 +1,6 @@
 # VELNEST submission copy
 
-Draft updated October 29, 2026. Live Twitch broadcaster authorization and OBS synchronization are verified; the required Twitch broadcast and YouTube demonstration are not yet complete. Do not treat this document as a submitted entry.
+Draft updated October 30, 2026. Real Twitch broadcaster authorization, OBS synchronization and the public Twitch demonstration are verified. A video is public on YouTube; a shorter, 179-second submission copy is prepared after the rules audit. Devpost final agreement and submission remain pending. See FINAL-SUBMISSION.md for the current video and entry status.
 
 ## Project name
 
@@ -64,4 +64,4 @@ The streamer opens the room's OBS Browser Source and shares the controller link.
 
 ## Still needed from the owner
 
-Personal answers and eligibility declarations are saved, and live broadcaster authorization and OBS synchronization are verified. Still needed: OBS account connection, genuine Twitch broadcast footage, a real YouTube URL and final review of the completed entry. No placeholder video URL should be entered.
+Personal answers and eligibility declarations, project description, gallery, source URL and Codex session ID are saved. The genuine YouTube URL is embedded in the project. Remaining: confirm publication of the 179-second submission copy, replace the embedded URL, and accept the final official-rules/Devpost agreement before clicking Submit project. No draft is described as submitted.

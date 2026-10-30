@@ -1,5 +1,8 @@
 # VELNEST demo delivery — October 29, 2026
 
+Historical 103-second assembly record. The owner subsequently selected a new
+3-minute film; current delivery/publication status is in [FINAL-SUBMISSION.md](FINAL-SUBMISSION.md).
+
 The owner explicitly authorized a public demonstration on meemokiller. OBS sent
 only the room Browser Source, with microphone and desktop audio muted. The actual
 Twitch player displayed the room, correct title, category and LIVE indicator.

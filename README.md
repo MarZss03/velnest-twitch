@@ -2,6 +2,9 @@
 
 VELNEST is an interactive world for Twitch communities. All signed-in Twitch viewers can choose an avatar and control it from desktop or mobile while the shared world appears in OBS.
 
+[Watch the project demonstration](https://www.youtube.com/watch?v=8-6oXTWjfto).
+See the [submission record](docs/FINAL-SUBMISSION.md) and [material credits](docs/VIDEO-CREDITS.md) for evidence and publication status.
+
 ## Current build
 
 The default local build uses clearly marked demo identity. The room includes:
@@ -17,7 +20,7 @@ The default local build uses clearly marked demo identity. The room includes:
 - broadcaster-only removal with a five-minute identity timeout.
 - a 24-character admission limit, with full-room spectating and automatic entry availability when a place opens.
 
-Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). On October 28 the owner authorized the live application, entered as the verified broadcaster and exercised reactions, accessories and sofa seating synchronized to OBS. A second real viewer account, public hosting and the actual Twitch broadcast demonstration remain to be verified.
+Real Twitch sign-in requires an application configured in the Twitch Developer Console. See [Twitch setup](docs/TWITCH-SETUP.md). The owner authorized the live application and exercised character entry, reactions, accessories and lounge seating synchronized to OBS. An authorized public demonstration ran on meemokiller on October 29, and the actual Twitch player received the room. A second real viewer account, physical-phone walkthrough and public application hosting remain unverified. Judges can install the included demo mode locally without Twitch credentials; public application hosting is not required by the repository-based testing instructions.
 
 ## Run locally
 
